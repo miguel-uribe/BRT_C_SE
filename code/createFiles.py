@@ -2,6 +2,7 @@
 # Creating the service definition file
 
 import numpy as np
+import pandas as pd
 import os
 from route_conf import *
 import matplotlib.pyplot as plt
@@ -116,6 +117,89 @@ for wagon in np.arange(6):
     np.savetxt(file,EL, fmt ='%d')  # the left change
     #fig, ax = plt.subplots(1,1, figsize=(4,10))
     #sns.heatmap(RC)
+file = os.path.join(dirname,"../conf/V.txt")
+np.savetxt(file,V, fmt ='%d')  # the speed
 
+# %%
+# Creating a file with the definition of all stops in the system
+stop_definition = ['Calle_100_N', 'Calle_100_S']
+
+text = ""
+for i, stop in enumerate(stop_definition):
+    text = text + "%d "%i+ stop +"\n"
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname,"../conf/stoplist.txt")
+file = open(filename, "w")
+file.write(text)
+file.close()
+
+# %%
+# Creating a file with the list of all the available stops in the system
+
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname,"../conf/stopdefinition.txt")
+file = open(filename, "w")
+text = '0'
+for i in range(6):
+    text = text +" %d"%(wN[i])
+text = text + '\n1'
+for i in range(6):
+    text = text +" %d"%(wN[i+6])
+file.write(text)
+file.close()
+# %%
+# Creating a file with the configuration of each service:
+
+serv_dict = {   '8N': [bL,{'Calle_100_N': np.random.choice(range(6))}],
+                '8S': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
+                'C50': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
+                'D10': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
+                'F14': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
+                'G12': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
+                'H13': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
+                'B13': [bL,{'Calle_100_N': np.random.choice(range(6))}],
+                'B71': [bL,{'Calle_100_N': np.random.choice(range(6))}],
+                'B12': [bL,{'Calle_100_N': np.random.choice(range(6))}],
+                'B14': [bL,{'Calle_100_N': np.random.choice(range(6))}],
+                'B10': [bL,{'Calle_100_N': np.random.choice(range(6))}],
+                'B50': [bL,{'Calle_100_N': np.random.choice(range(6))}],
+                'GenS': [bL+L,{}],
+                'GenN': [bL,{}]
+             }
+
+# We now print the file with the route list
+text = ""
+for i, route in enumerate(serv_dict.keys()):
+    text = text + "%d "%i + route + "\n"
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname,"../conf/routelist.txt")
+file = open(filename, "w")
+file.write(text)
+file.close()
+    
+
+
+# now we print the file with the route definition
+text = ""
+stoplist = pd.read_csv('../conf/stoplist.txt', names = ['ID', 'name'], sep = " ")
+routelist = pd.read_csv('../conf/routelist.txt', names = ['ID', 'name'], sep = " ")
+for route_name, stops in serv_dict.items():
+    routeID = routelist[routelist['name']==route_name]['ID'].values[0]
+    text = text + "%d %d "%(routeID,stops[0])
+    for stop_name, stID in stops[1].items():
+        stopID = stoplist[stoplist['name']==stop_name]['ID'].values[0]
+        text = text + "%d %d "%(stopID,stID)
+    text = text + "\n"
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname,"../conf/routedefinition.txt")
+file = open(filename, "w")
+file.write(text)
+file.close()
+# %%
+# Creating a file with the average line headways
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname,"../conf/routeheadways.txt")
+headways = np.random.choice(np.arange(100, 1000, 1), size = len(serv_dict))
+np.savetxt(filename, np.hstack( (np.arange(len(serv_dict)).reshape(len(serv_dict),1),headways.reshape(len(serv_dict),1))), fmt='%d')
 
 # %%
