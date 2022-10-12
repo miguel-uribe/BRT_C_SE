@@ -141,10 +141,10 @@ filename = os.path.join(dirname,"../conf/stopdefinition.txt")
 file = open(filename, "w")
 text = '0'
 for i in range(6):
-    text = text +" %d"%(wN[i])
+    text = text +" %d %d "%(wN[i], (i)%2)
 text = text + '\n1'
 for i in range(6):
-    text = text +" %d"%(wN[i+6])
+    text = text +" %d %d "%(wN[i+6], (i)%2)
 file.write(text)
 file.close()
 # %%
@@ -167,38 +167,38 @@ serv_dict = {   '8N': [bL,{'Calle_100_N': np.random.choice(range(6))}],
                 'GenN': [bL,{}]
              }
 
-# We now print the file with the route list
+# We now print the file with the service list
 text = ""
-for i, route in enumerate(serv_dict.keys()):
-    text = text + "%d "%i + route + "\n"
+for i, service in enumerate(serv_dict.keys()):
+    text = text + "%d "%i + service + "\n"
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname,"../conf/routelist.txt")
+filename = os.path.join(dirname,"../conf/servicelist.txt")
 file = open(filename, "w")
 file.write(text)
 file.close()
     
 
 
-# now we print the file with the route definition
+# now we print the file with the service definition
 text = ""
 stoplist = pd.read_csv('../conf/stoplist.txt', names = ['ID', 'name'], sep = " ")
-routelist = pd.read_csv('../conf/routelist.txt', names = ['ID', 'name'], sep = " ")
-for route_name, stops in serv_dict.items():
-    routeID = routelist[routelist['name']==route_name]['ID'].values[0]
-    text = text + "%d %d "%(routeID,stops[0])
+servicelist = pd.read_csv('../conf/servicelist.txt', names = ['ID', 'name'], sep = " ")
+for service_name, stops in serv_dict.items():
+    serviceID = servicelist[servicelist['name']==service_name]['ID'].values[0]
+    text = text + "%d %d "%(serviceID,stops[0])
     for stop_name, stID in stops[1].items():
         stopID = stoplist[stoplist['name']==stop_name]['ID'].values[0]
         text = text + "%d %d "%(stopID,stID)
     text = text + "\n"
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname,"../conf/routedefinition.txt")
+filename = os.path.join(dirname,"../conf/servicedefinition.txt")
 file = open(filename, "w")
 file.write(text)
 file.close()
 # %%
 # Creating a file with the average line headways
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname,"../conf/routeheadways.txt")
+filename = os.path.join(dirname,"../conf/serviceheadways.txt")
 headways = np.random.choice(np.arange(100, 1000, 1), size = len(serv_dict))
 np.savetxt(filename, np.hstack( (np.arange(len(serv_dict)).reshape(len(serv_dict),1),headways.reshape(len(serv_dict),1))), fmt='%d')
 
