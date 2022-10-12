@@ -141,10 +141,10 @@ filename = os.path.join(dirname,"../conf/stopdefinition.txt")
 file = open(filename, "w")
 text = '0'
 for i in range(6):
-    text = text +" %d %d "%(wN[i], (i)%2)
+    text = text +" %d %d"%(wN[i], (i)%2)
 text = text + '\n1'
 for i in range(6):
-    text = text +" %d %d "%(wN[i+6], (i)%2)
+    text = text +" %d %d"%(wN[i+6], (i)%2)
 file.write(text)
 file.close()
 # %%
