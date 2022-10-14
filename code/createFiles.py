@@ -195,11 +195,29 @@ filename = os.path.join(dirname,"../conf/servicedefinition.txt")
 file = open(filename, "w")
 file.write(text)
 file.close()
+
 # %%
 # Creating a file with the average line headways
 dirname = os.path.dirname(__file__)
-filename = os.path.join(dirname,"../conf/serviceheadways.txt")
+filename = os.path.join(dirname,"../conf/servicedata.txt")
+file = open(filename, "w")
+# the list of headways
 headways = np.random.choice(np.arange(100, 1000, 1), size = len(serv_dict))
-np.savetxt(filename, np.hstack( (np.arange(len(serv_dict)).reshape(len(serv_dict),1),headways.reshape(len(serv_dict),1))), fmt='%d')
+# the list of dwell times
+dwelltimes = np.random.choice(np.arange(30, 50, 1), size = len(serv_dict))
+# the list of headway dependent dwell time
+dwelltimes2 = np.random.choice(np.arange(0.1, 1, 0.8), size = len(serv_dict))
+# the list of headway dependent dwell time
+widths = np.random.choice(np.arange(0.01, 0.2, 0.01), size = len(serv_dict))
+# this list of biarticulated values
+biart = np.random.choice([0,1], size = len(serv_dict))
+
+text = ""
+for i,_ in enumerate(serv_dict.keys()):
+    text =text + "%d %f %f %f %f %d\n"%(i,headways[i], dwelltimes[i], dwelltimes2[i], widths[i], biart[i])
+
+file.write(text)
+file.close()
+#np.savetxt(filename, np.hstack( (np.arange(len(serv_dict)).reshape(len(serv_dict),1),headways,dwelltimes, dwelltimes2, widths, biart)), fmt='%.4f')
 
 # %%

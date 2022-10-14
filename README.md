@@ -30,10 +30,29 @@ This file containg the information about the stops of a bus service, each line m
 ### conf/servicedetails.txt
 This file contains the detailed information about each of the bus services in the system. Each line represents a bus service and must contain the following information separated by a space:
 - `int` The service ID, which must be the same than in the `servicelist.txt` file.
-- `float` the average service headway, in seconds. At each time step, the buses will be introduced into the system using a Poisson distribution with the headway as the mean.
+- `float` the average service headway, $h$, in seconds. At each time step, the buses will be introduced into the system using a Poisson distribution with the headway as the mean.
 - `float` the base dwell time, $b$, in seconds.
 - `float` the headway dependent dwell time, $\nu$. In our model we assume that the larger the headway, the larger the occupation in the bus and the larger the dwell time.
 - `float` the width of the dwell time distribution function, $w$. There is a random component in the dwell time. At each stop, the dwell time will be computed using a normal distribution with mean:
 $$\tau = b + h\nu$$
 and with standard deviation:
 $$\sigma = w\tau$$
+- `int` the percentage of biarticulated buses assigned to the bus service. If this number is larger than 0, the bus service cannot be assigned to a wagon without support for biarticulated buses.
+
+### ['conf/lanes_wagon_%d.txt'%i for i in range(len(wagons))]
+These are the lane configuration files for each of the wagons at the station, here each column represents a lane, each row represents a cell along the corridor. A 0 indicates that the lane is not available for circulation, a 1 indicates that the lane is available.
+
+### ['conf/lanes_wagon_%d.txt'%i for i in range(len(wagons))]
+These are the lane configuration files for each of the wagons at the station, here each column represents a lane (0, main lane; 1, stopping lane), each row represents a cell along the corridor. A 0 indicates that the lane is not available for circulation, a 1 indicates that the lane is available.
+
+### ['conf/RC_wagon_%d.txt'%i for i in range(len(wagons))]
+These are the change to the right files, here each column represents a lane (0, main lane; 1, stopping lane), each row represents a cell along the corridor. A 1 means that it is possible to change lanes to the right (decrease the lane), a 0 means that it is not possible to decrease the lane.
+
+### ['conf/LC_wagon_%d.txt'%i for i in range(len(wagons))]
+These are the change to the left files, here each column represents a lane (0, main lane; 1, stopping lane), each row represents a cell along the corridor. A 1 means that it is possible to change lanes to the left (increase the lane), a 0 means that it is not possible to increase the lane.
+
+### ['conf/EL_wagon_%d.txt'%i for i in range(len(wagons))]
+These are the end of lane files, here each column represents a lane (0, main lane; 1, stopping lane), each row represents a cell along the corridor. The value in each row-column corresponds to the distance to the next end of lane from the current position. When there is no lane end, a 1000 will appear.
+
+### conf/V.txt
+This is the maximum speed file, here each column represents a lane (0, main lane; 1, stopping lane), each row represents a cell along the corridor. The value in each row-column corresponds to the maximum speed, in m/s, at the current position.
