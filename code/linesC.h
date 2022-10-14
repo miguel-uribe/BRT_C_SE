@@ -5,6 +5,7 @@
 #include "stationC.h"
 #include <cstdlib>
 #include <vector>
+#include <random>
 
 class lineC{
     public:

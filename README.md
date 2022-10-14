@@ -24,7 +24,8 @@ This file contains the list of bus service to be defined in the system, it has t
 ### conf/servicedefinition.txt
 This file containg the information about the stops of a bus service, each line must contain the following information separated by spaces:
 - `int` The service ID, which must be the same than in the `servicelist.txt` file.
-- `int` The point where the buses servicing this line will appear in the system. In case the position is occupied, the algorithm will try to place the bus a distance `max(busL)` away. If the algorithm does not find space to place the bus, it will place it at the origin and will raise a warning error.
+- `int` The point where the buses servicing this line will appear in the system.
+- `int` The point where the buses reach the end of the service. When buses overcome this point they are automatically added to the parked list.
 - Next, a succession of pairs `int` `int` will appear for each station where the service makes a stop. The first integer number corresponds to the ID of the station, the second corresponds to the ID of the door at the station where the bus will make the stop. The ID of the doors are assigned according to their appearance in the stopdefinition file, the first door will have ID 0, the second will have ID 1 and so on.
 
 ### conf/servicedetails.txt

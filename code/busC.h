@@ -13,111 +13,48 @@
 #include <deque>
 #include <random>
 
-/*
+
 
 // creating a bus
-void createbus(int LINEID, System& SYSTEM, std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], std::deque<int> QUEUES[2], std::vector<int> PARKED[2], int TIME){
-    int acc = SYSTEM.Lines[LINEID].acc; // We check the direction of movement
-    //std::cout<<"Creating bus for service "<<LINEID<<" with acceleration "<<acc<<std::endl;
-    if (acc>0){ // buses moving in the east direction   
-        // we check whether there are buses available
-        if (!PARKED[0].empty()){ // if there are indeed buses available
-            // we append the bus parameters at the end 
-            BUSESPAR[0].push_back(SYSTEM.limits[0]); //position
-            BUSESPAR[1].push_back(0); // lane
-            BUSESPAR[2].push_back(0); // speed
-            BUSESPAR[3].push_back(0); // gapf
-            BUSESPAR[4].push_back(0); // gapfl
-            BUSESPAR[5].push_back(0); // gapbl
-            BUSESPAR[6].push_back(0); //vbef
-            BUSESPAR[10].push_back(acc); // acceleration
-            BUSESPAR[11].push_back(LINEID); //lineID
-            BUSESPAR[12].push_back(0); //laststoptime
-            BUSESPAR[13].push_back(0); // stoptime
-            BUSESPAR[14].push_back(0); // dwell time
-            BUSESPAR[16].push_back(0); // bus occupation
-            BUSESPAR[17].push_back(PARKED[0].back()); // The bus is
-            BUSESPAR[18].push_back(TIME); //the initial time
-    
-            BUSESBOOL[0].push_back(true); //changing
-            BUSESBOOL[1].push_back(true); //advancing
+void createbus(std::vector<int>& Parked, int LINEID, System& SYSTEM, std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], int TIME){
+    // we check there are buses available
+    if(!Parked.empty()){  
+        // we append the bus parameters at the end 
+        BUSESPAR[0].push_back(SYSTEM.Lines[LINEID].origin); //position
+        BUSESPAR[1].push_back(0); // lane
+        BUSESPAR[2].push_back(0); // speed
+        BUSESPAR[3].push_back(0); // gapf
+        BUSESPAR[4].push_back(0); // gapfl
+        BUSESPAR[5].push_back(0); // gapbl
+        BUSESPAR[6].push_back(0); //vbef
+        BUSESPAR[10].push_back(LINEID); //lineID
+        BUSESPAR[11].push_back(0); // stoptime
+        BUSESPAR[12].push_back(0); // dwell time
+        BUSESPAR[13].push_back(Parked.back()); // The bus ID
+        BUSESPAR[14].push_back(TIME); //the initial time
+        BUSESBOOL[0].push_back(true); //advancing
 
-            //std::cout<<"Created bus for "<<LINEID<<" at time "<<TIME<<" with acceleration "<<acc<<std::endl;
-            /*if (BUSESPAR[17].back()==1){
-                std::cout<<"Bus 75 inserted"<<std::endl;
-            }*/
-/*
-            // we retrieve the first stop information
-            if (SYSTEM.Lines[LINEID].stopx.size()>0){ // in case there are stops
-                BUSESPAR[7].push_back(SYSTEM.Lines[LINEID].stopx[0]);
-                BUSESPAR[8].push_back(SYSTEM.Lines[LINEID].stationIDs[0]);
-                BUSESPAR[9].push_back(SYSTEM.Stations[BUSESPAR[8].back()].x+(Nw-1)*Ds+Dw+2*Db);
-                BUSESPAR[15].push_back(0); // next station index
-            }
-            else{ // the nonstop buses
-                BUSESPAR[7].push_back(1e6);
-                BUSESPAR[8].push_back(-1);
-                BUSESPAR[9].push_back(1e6);
-                BUSESPAR[15].push_back(-1);
-            }
-            // We remove the bus from the parking list
-            PARKED[0].pop_back();
-        }
-        else{  // if there are no buses available, we introduce the bus to the queue
-            QUEUES[0].push_back(LINEID);
-        }
-    }
-    else if (acc<0){ //Buses moving in the west direction
-        // we check whether there are buses available
-        if (!PARKED[1].empty()){ // if there are indeed buses available
             
-            BUSESPAR[0].push_back(SYSTEM.limits[1]); //position
-            BUSESPAR[1].push_back(0); // lane
-            BUSESPAR[2].push_back(0); // speed
-            BUSESPAR[3].push_back(0); // gapf
-            BUSESPAR[4].push_back(0); // gapfl
-            BUSESPAR[5].push_back(0); // gapbl
-            BUSESPAR[6].push_back(0); //vbef
-            BUSESPAR[10].push_back(acc); // acceleration
-            BUSESPAR[11].push_back(LINEID); //lineID
-            BUSESPAR[12].push_back(0); //lineID
-            BUSESPAR[13].push_back(0); // laststoptime
-            BUSESPAR[14].push_back(0); // dwell time
-            BUSESPAR[16].push_back(0); // bus occupation
-            BUSESPAR[17].push_back(PARKED[1].back()); // The bus is
-            BUSESPAR[18].push_back(TIME); //the initial time
-
-            BUSESBOOL[0].push_back(true); //changing
-            BUSESBOOL[1].push_back(true); //advancing
-
-          /*  if (BUSESPAR[17].back()==1){
-                std::cout<<"Bus 75 inserted"<<std::endl;
-            }*/
-
-            /*
-            //std::cout<<"Created bus for "<<LINEID<<std::endl;
-            // we retrieve the first stop information
-                // we retrieve the first stop information
-            if (SYSTEM.Lines[LINEID].stopx.size()>0){ // in case there are stops
-                BUSESPAR[7].push_back(SYSTEM.Lines[LINEID].stopx[0]);
-                BUSESPAR[8].push_back(SYSTEM.Lines[LINEID].stationIDs[0]);
-                BUSESPAR[9].push_back(SYSTEM.Stations[BUSESPAR[8].back()].x-2*Db);
-                BUSESPAR[15].push_back(0);
-            }
-            else{ // the nonstop buses
-                BUSESPAR[7].push_back(-1e6);
-                BUSESPAR[8].push_back(-1);
-                BUSESPAR[9].push_back(-1e6);
-                BUSESPAR[15].push_back(-1);
-            }
-            // We remove the bus from the parking list
-            PARKED[1].pop_back();
+        // we retrieve the first stop information
+        if (SYSTEM.Lines[LINEID].stopx.size()>0){ // in case there are stops
+            BUSESPAR[7].push_back(SYSTEM.Lines[LINEID].stopx[0]); // the position of the next stop
+            BUSESPAR[8].push_back(SYSTEM.Lines[LINEID].stationIDs[0]); // the ID of the next station
+            BUSESPAR[9].push_back(0); // next station index
         }
-        else{  // if there are no buses available, we introduce the bus to the queue
-            QUEUES[1].push_back(LINEID);
+        else{ // the nonstop buses
+            BUSESPAR[7].push_back(1e6); // the position of the next stop
+            BUSESPAR[8].push_back(-1); // the position of the next stop
+            BUSESPAR[9].push_back(-1); // next station index
         }
+
+        // We remove the bus from the parked list
+        Parked.pop_back();
     }
-} */
+    // If there are no buses, we must throw a warning
+    else{
+        std::cout<<"WARNING! There entire fleet is used, please increase the fleet number"<<std::endl; 
+    }
+} 
 /*
 void initializeBusArray(std::vector<int> & PARKED){
     for (int i=0; i<fleet; i++){
@@ -714,19 +651,21 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
 
 
 */
-/*
+
 // inserting the buses in the system
-void populate(std::vector<int> BUSESPAR[Nparam], System& SYSTEM, std::vector<bool> BUSESBOOL[Nbool], std::vector<int>& PARKED,  std::default_random_engine generator){
+void populate(std::vector<int>& Parked, std::vector<int> BUSESPAR[Nparam], System& SYSTEM, std::vector<bool> BUSESBOOL[Nbool], std::default_random_engine &generator, std::vector<std::poisson_distribution<int>> distr, int time){
     int nbus;
     // Now we check and see whether it is time to populate
     // we scan over the lines   
     for (int i=0; i<NLines; i++){
         // determining how many buses must be included for each line
-        std::poisson_distribution<int> distribution (getPassengersDemand(factor,TIME));
-        npass = distribution(generator);
+        nbus = distr[i](generator);
+        if (nbus>0){ // if there are buses to add
+            createbus(Parked, i, SYSTEM, BUSESPAR, BUSESBOOL, time);
+        }
     }
 }
-*/
+
 /*
 
 // Calculating the passenger flow and the station occupation

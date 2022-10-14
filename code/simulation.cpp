@@ -44,7 +44,6 @@ int main (int argc, char **argv){
 
     cout<<"Created the system"<< endl;   
     
-
     //////////////////////////////////////////////////////////////////
     /////////// Loading the lane information
     ///////////////////////////////////////////
@@ -70,19 +69,24 @@ int main (int argc, char **argv){
     std::default_random_engine generator (seed);
     srand(seed);
     //cout<<"Defined the seed"<< endl;   
+    
+    /////////////////////////////////////////////////////////////////
+    ///////////////// Creating the distributions
+    std::vector<std::poisson_distribution<int>> distr;
+    for(int i = 0; i<NLines ; i++){
+        distr.push_back(std::poisson_distribution<int> (1.0/SYSTEM.Lines[i].headway));
+    }
+
     ///////////////////////////////////////////////////////////////
     // Creating the bus array
-/*
+
     vector<int> index;
-    vector<int> Parked; 
     vector<int> BusesPar[Nparam];
     vector<bool> BusesBool[Nbool];
-    deque<int> Queues[2]; // 0 for East, 1 for West
-    initializeBusArray(Parked);
-    cout<<Parked.size()<<endl;
-*/
+    vector<int> Parked(fleet); // The list of parked buses
+    std::iota(Parked.begin(), Parked.end(),0); // we fill the list with numbers
 
-
+    cout<<"Created the bus array"<<endl;
     ///////////////////////////////////////////////////////////////
     // the simulation parameters
 
@@ -95,21 +99,22 @@ int main (int argc, char **argv){
     
     /////////////////////////////////////////////////////////
     // performing the simulation
-    /*
-    for (int TIME=4*3600; TIME<5*3600;TIME++){      
+    int nbuses = 0;
+    for (int TIME=0; TIME<3600;TIME++){      
         // inserting the buses
         //cout<<t<<endl;
         
-        populate(BusesPar, SYSTEM, BusesBool, Parked);
-        /*
+        populate(Parked, BusesPar, SYSTEM, BusesBool, generator, distr, TIME);
         sortbuses(BusesPar,BusesBool, index);
+        /*
         buschangelane(BusesPar, BusesBool,SYSTEM, TIME);
         calculategaps(BusesPar,BusesBool);
         //std::cout<<"Bus advanced in test"<<std::endl;
         busadvance(BusesPar,BusesBool,SYSTEM,TIME,RM.matrix, Queues, bussp, cost);
-        calculategaps(BusesPar,BusesBool);
-    }*/
-    
+        calculategaps(BusesPar,BusesBool);*/
+    }
+    cout<<Parked.size()<<endl;
+    cout<<BusesPar[0].size()<<endl;
 /*
    // cout<<"Finished the simulation"<< endl;   
 
