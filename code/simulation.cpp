@@ -53,17 +53,17 @@ int main (int argc, char **argv){
     
     
     array<array<int, 2*L>, Nmax> V;
-    V = loadspeedfile("V");
+    V = loadconffile("V", 1.0*Dt/Dx);
     
 
     array<array<array<int, 2*L>, Nmax>, nkind> lanes, LC, RC, EL;
-    lanes = loadconffilekind("lanes");
-    LC = loadconffilekind("LC");
-    RC = loadconffilekind("RC");
-    EL = loadconffilekind("EL");
+    lanes = loadconffilekind("lanes", 1);
+    LC = loadconffilekind("LC", 1);
+    RC = loadconffilekind("RC", 1);
+    EL = loadconffilekind("EL", 1.0/Dx);
     
     cout<<"Loaded the configuration files"<<endl;
-    cout<<V[0][0]<<endl;
+    
     /////////////////////////////////////////////////////////////
     // the seed
     int seed = stoi(argv[1]);

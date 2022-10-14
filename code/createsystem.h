@@ -71,7 +71,6 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         iss>>read;
         lName = read;
         SYSTEM.Lines[ID] = lineC(lName);
-        std::cout<<lName<<std::endl;
     }
     // loading the headway information
 
@@ -127,8 +126,8 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
 
 }
 
-// this script loads the configuration files and creates the corresponding lane configuration
-std::array<std::array<int, 2*L>, Nmax> loadconffile(std::string root){
+// this script loads the configuration files and creates the corresponding lane configuration, the factor is a multiplying factor to be applied in case it is needed
+std::array<std::array<int, 2*L>, Nmax> loadconffile(std::string root, float factor){
     // creating the array
     std::array<std::array<int, 2*L>, Nmax> lanes;
     // opening the file
@@ -143,31 +142,7 @@ std::array<std::array<int, 2*L>, Nmax> loadconffile(std::string root){
         std::istringstream iss(str);
         for (int j=0; j<Nmax; j++){
             iss>>val;
-            lanes[j][i] = val;
-        }
-        i++;
-    }
-    file.close();
-    return lanes;
-}
-
-// this script loads the configuration files and creates the corresponding lane configuration
-std::array<std::array<int, 2*L>, Nmax> loadspeedfile(std::string root){
-    // creating the array
-    std::array<std::array<int, 2*L>, Nmax> lanes;
-    // opening the file
-    std::string filename = "../conf/";
-    filename = filename + root + ".txt";
-    std::ifstream file(filename);
-    std::string str;
-    float val;
-    int i = 0;
-    while (std::getline(file,str)){
-        // retrieving the origin and destination stations
-        std::istringstream iss(str);
-        for (int j=0; j<Nmax; j++){
-            iss>>val;
-            lanes[j][i] = (int) val*Dt/Dx;
+            lanes[j][i] = (int) val*factor;
         }
         i++;
     }
@@ -176,9 +151,8 @@ std::array<std::array<int, 2*L>, Nmax> loadspeedfile(std::string root){
 }
 
 
-
-// this script loads the configuration files and creates the corresponding lane configuration when there are many different kinds of configuration files
-std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> loadconffilekind(std::string root){
+// this script loads the configuration files and creates the corresponding lane configuration when there are many different kinds of configuration files, the factor is a multiplying factor to be applied in case it is needed
+std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> loadconffilekind(std::string root, float factor){
 
     // creating the array
     std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> lanes;
@@ -189,14 +163,14 @@ std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> loadconffilekind(std::
         //std::cout<<filename<<std::endl;
         std::ifstream file(filename);
         std::string str;
-        int val;
+        float val;
         int i = 0;
         while (std::getline(file,str)){
             // retrieving the value for each position
             std::istringstream iss(str);
             for (int j=0; j<Nmax; j++){
                 iss>>val;
-                lanes[k][j][i] = val;
+                lanes[k][j][i] = (int) val*factor;
             }
             i++;
         }
