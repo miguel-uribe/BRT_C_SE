@@ -47,8 +47,10 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         iss>>read;
         ID = std::stoi(read);
         while(iss>>read){
-            int stoppos = std::stoi(read);
-            SYSTEM.Stations[ID].addstop(stoppos);
+            int stoppos = (int) std::stof(read)/Dx;
+            iss>>read;
+            int biart = std::stoi(read);
+            SYSTEM.Stations[ID].addstop(stoppos, biart);
         }
     }
 
@@ -69,6 +71,7 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         iss>>read;
         lName = read;
         SYSTEM.Lines[ID] = lineC(lName);
+        std::cout<<lName<<std::endl;
     }
     // loading the headway information
 
@@ -78,7 +81,19 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         ID = std::stoi(read);
         iss>>read;
         int headway = std::stoi(read);
+        iss>>read;
+        int dwelltime = std::stoi(read);
+        iss>>read;
+        float dwellhwy = std::stof(read);
+        iss>>read;
+        float dwellwidth = std::stof(read);
+        iss>>read;
+        int biart = std::stoi(read);
         SYSTEM.Lines[ID].headway = headway;
+        SYSTEM.Lines[ID].dwelltime = dwelltime;
+        SYSTEM.Lines[ID].dwellhway = dwellhwy;
+        SYSTEM.Lines[ID].dwellwidth = dwellwidth;
+        SYSTEM.Lines[ID].biart = biart;
     }
     // loading the information regarding the stops
     std::vector<int> stationIDs;
@@ -121,7 +136,7 @@ std::array<std::array<int, 2*L>, Nmax> loadconffile(std::string root){
     filename = filename + root + ".txt";
     std::ifstream file(filename);
     std::string str;
-    int val;
+    float val;
     int i = 0;
     while (std::getline(file,str)){
         // retrieving the origin and destination stations
@@ -129,6 +144,30 @@ std::array<std::array<int, 2*L>, Nmax> loadconffile(std::string root){
         for (int j=0; j<Nmax; j++){
             iss>>val;
             lanes[j][i] = val;
+        }
+        i++;
+    }
+    file.close();
+    return lanes;
+}
+
+// this script loads the configuration files and creates the corresponding lane configuration
+std::array<std::array<int, 2*L>, Nmax> loadspeedfile(std::string root){
+    // creating the array
+    std::array<std::array<int, 2*L>, Nmax> lanes;
+    // opening the file
+    std::string filename = "../conf/";
+    filename = filename + root + ".txt";
+    std::ifstream file(filename);
+    std::string str;
+    float val;
+    int i = 0;
+    while (std::getline(file,str)){
+        // retrieving the origin and destination stations
+        std::istringstream iss(str);
+        for (int j=0; j<Nmax; j++){
+            iss>>val;
+            lanes[j][i] = (int) val*Dt/Dx;
         }
         i++;
     }

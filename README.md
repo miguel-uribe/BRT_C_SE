@@ -30,8 +30,8 @@ This file containg the information about the stops of a bus service, each line m
 ### conf/servicedetails.txt
 This file contains the detailed information about each of the bus services in the system. Each line represents a bus service and must contain the following information separated by a space:
 - `int` The service ID, which must be the same than in the `servicelist.txt` file.
-- `float` the average service headway, $h$, in seconds. At each time step, the buses will be introduced into the system using a Poisson distribution with the headway as the mean.
-- `float` the base dwell time, $b$, in seconds.
+- `int` the average service headway, $h$, in seconds. At each time step, the buses will be introduced into the system using a Poisson distribution with the headway as the mean.
+- `int` the base dwell time, $b$, in seconds.
 - `float` the headway dependent dwell time, $\nu$. In our model we assume that the larger the headway, the larger the occupation in the bus and the larger the dwell time.
 - `float` the width of the dwell time distribution function, $w$. There is a random component in the dwell time. At each stop, the dwell time will be computed using a normal distribution with mean:
 $$\tau = b + h\nu$$

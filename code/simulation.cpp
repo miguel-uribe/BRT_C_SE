@@ -30,17 +30,17 @@ int main (int argc, char **argv){
     System SYSTEM;
     std::string stoplist = "../conf/stoplist.txt";
     std::string stopdefinition = "../conf/stopdefinition.txt";
-    std::string routelist = "../conf/routelist.txt";
-    std::string routedefinition = "../conf/routedefinition.txt";
-    std::string routeheadways = "../conf/routeheadways.txt";
+    std::string routelist = "../conf/servicelist.txt";
+    std::string routedefinition = "../conf/servicedefinition.txt";
+    std::string routeheadways = "../conf/servicedata.txt";
     
     //cout<<servicefile<<endl;
     SYSTEM = createsystem(stoplist, stopdefinition, routelist, routedefinition, routeheadways);
 
-/*
-    for (auto & line: SYSTEM.Lines){
+
+    for (auto & line: SYSTEM.Stations){
         cout<<line.display()<<endl;
-    }*/
+    }
 
     cout<<"Created the system"<< endl;   
     
@@ -53,7 +53,7 @@ int main (int argc, char **argv){
     
     
     array<array<int, 2*L>, Nmax> V;
-    V = loadconffile("V");
+    V = loadspeedfile("V");
     
 
     array<array<array<int, 2*L>, Nmax>, nkind> lanes, LC, RC, EL;
@@ -63,7 +63,7 @@ int main (int argc, char **argv){
     EL = loadconffilekind("EL");
     
     cout<<"Loaded the configuration files"<<endl;
-
+    cout<<V[0][0]<<endl;
     /////////////////////////////////////////////////////////////
     // the seed
     int seed = stoi(argv[1]);
@@ -72,7 +72,7 @@ int main (int argc, char **argv){
     //cout<<"Defined the seed"<< endl;   
     ///////////////////////////////////////////////////////////////
     // Creating the bus array
-
+/*
     vector<int> index;
     vector<int> Parked; 
     vector<int> BusesPar[Nparam];
@@ -80,7 +80,7 @@ int main (int argc, char **argv){
     deque<int> Queues[2]; // 0 for East, 1 for West
     initializeBusArray(Parked);
     cout<<Parked.size()<<endl;
-
+*/
 
 
     ///////////////////////////////////////////////////////////////
@@ -95,6 +95,7 @@ int main (int argc, char **argv){
     
     /////////////////////////////////////////////////////////
     // performing the simulation
+    /*
     for (int TIME=4*3600; TIME<5*3600;TIME++){      
         // inserting the buses
         //cout<<t<<endl;
@@ -106,8 +107,9 @@ int main (int argc, char **argv){
         calculategaps(BusesPar,BusesBool);
         //std::cout<<"Bus advanced in test"<<std::endl;
         busadvance(BusesPar,BusesBool,SYSTEM,TIME,RM.matrix, Queues, bussp, cost);
-        calculategaps(BusesPar,BusesBool);*/
-    }
+        calculategaps(BusesPar,BusesBool);
+    }*/
+    
 /*
    // cout<<"Finished the simulation"<< endl;   
 

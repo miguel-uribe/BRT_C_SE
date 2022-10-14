@@ -8,12 +8,16 @@
 
 class lineC{
     public:
-        std::string name;
-        std::vector<int> stationIDs;
-        std::vector<int> wagons;
-        std::vector<int> stopx;
-        int origin;
-        int headway;
+        std::string name;  // The name of the bus service
+        std::vector<int> stationIDs; // A list of station IDs where the service stops
+        std::vector<int> wagons; // A list with the wagon ID at each station where the service stops
+        std::vector<int> stopx; // A list with the positions of the stops where the service stops
+        int origin; // The position where buses serving this service are introduced
+        int headway; // The average headway for the service
+        int dwelltime; // The base dwell time for the service
+        float dwellhway; // The d (dwelltime)/d(headway) ratio
+        float dwellwidth; // the width of the dwell time distribution
+        int biart; // percentage of biarticulated buses
         // Dummy constructor
         lineC(){}
         // real constructor
@@ -30,6 +34,10 @@ std::string lineC::display (void){
     std::string text = "Line "+ name;
     text = text + ". Headway: " + std::to_string(headway);
     text = text + ". Origin: " + std::to_string(origin);
+    text = text + ". Dwelltime: " + std::to_string(dwelltime);
+    text = text + ". Dwelltime/headway: " + std::to_string(dwellhway);
+    text = text + ". Dwelltime dist. width: " + std::to_string(dwellwidth);
+    text = text + ". Biarticulated proportion: " + std::to_string(biart);
     text = text + ". Stopping at stations: ";
     for(int i =0; i<stationIDs.size(); i++){
         text = text + std::to_string(stationIDs[i]) +"("+std::to_string(wagons[i])+", "+std::to_string(stopx[i])+")\n";

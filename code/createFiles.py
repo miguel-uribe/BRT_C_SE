@@ -206,15 +206,15 @@ headways = np.random.choice(np.arange(100, 1000, 1), size = len(serv_dict))
 # the list of dwell times
 dwelltimes = np.random.choice(np.arange(30, 50, 1), size = len(serv_dict))
 # the list of headway dependent dwell time
-dwelltimes2 = np.random.choice(np.arange(0.1, 1, 0.8), size = len(serv_dict))
+dwelltimes2 = np.random.choice(np.arange(0.1, 1, 0.1), size = len(serv_dict))
 # the list of headway dependent dwell time
 widths = np.random.choice(np.arange(0.01, 0.2, 0.01), size = len(serv_dict))
 # this list of biarticulated values
-biart = np.random.choice([0,1], size = len(serv_dict))
+biart = np.random.choice([0,100], size = len(serv_dict))
 
 text = ""
 for i,_ in enumerate(serv_dict.keys()):
-    text =text + "%d %f %f %f %f %d\n"%(i,headways[i], dwelltimes[i], dwelltimes2[i], widths[i], biart[i])
+    text =text + "%d %d %d %f %f %d\n"%(i,headways[i], dwelltimes[i], dwelltimes2[i], widths[i], biart[i])
 
 file.write(text)
 file.close()

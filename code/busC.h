@@ -118,13 +118,13 @@ void createbus(int LINEID, System& SYSTEM, std::vector<int> BUSESPAR[Nparam], st
         }
     }
 } */
-
+/*
 void initializeBusArray(std::vector<int> & PARKED){
     for (int i=0; i<fleet; i++){
         PARKED.push_back(i);
         
     }
-}
+}*/
 
 /*
 
@@ -714,7 +714,7 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
 
 
 */
-
+/*
 // inserting the buses in the system
 void populate(std::vector<int> BUSESPAR[Nparam], System& SYSTEM, std::vector<bool> BUSESBOOL[Nbool], std::vector<int>& PARKED,  std::default_random_engine generator){
     int nbus;
@@ -726,7 +726,7 @@ void populate(std::vector<int> BUSESPAR[Nparam], System& SYSTEM, std::vector<boo
         npass = distribution(generator);
     }
 }
-
+*/
 /*
 
 // Calculating the passenger flow and the station occupation
