@@ -150,21 +150,21 @@ file.close()
 # %%
 # Creating a file with the configuration of each service:
 
-serv_dict = {   '8N': [bL,{'Calle_100_N': np.random.choice(range(6))}],
-                '8S': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
-                'C50': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
-                'D10': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
-                'F14': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
-                'G12': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
-                'H13': [bL+L,{'Calle_100_S': np.random.choice(range(6))}],
-                'B13': [bL,{'Calle_100_N': np.random.choice(range(6))}],
-                'B71': [bL,{'Calle_100_N': np.random.choice(range(6))}],
-                'B12': [bL,{'Calle_100_N': np.random.choice(range(6))}],
-                'B14': [bL,{'Calle_100_N': np.random.choice(range(6))}],
-                'B10': [bL,{'Calle_100_N': np.random.choice(range(6))}],
-                'B50': [bL,{'Calle_100_N': np.random.choice(range(6))}],
-                'GenS': [bL+L,{}],
-                'GenN': [bL,{}]
+serv_dict = {   '8N': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
+                '8S': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
+                'C50': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
+                'D10': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
+                'F14': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
+                'G12': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
+                'H13': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
+                'B13': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
+                'B71': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
+                'B12': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
+                'B14': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
+                'B10': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
+                'B50': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
+                'GenS': [bL+L,2*L,{}],
+                'GenN': [bL,L,{}]
              }
 
 # We now print the file with the service list
@@ -185,8 +185,8 @@ stoplist = pd.read_csv('../conf/stoplist.txt', names = ['ID', 'name'], sep = " "
 servicelist = pd.read_csv('../conf/servicelist.txt', names = ['ID', 'name'], sep = " ")
 for service_name, stops in serv_dict.items():
     serviceID = servicelist[servicelist['name']==service_name]['ID'].values[0]
-    text = text + "%d %d "%(serviceID,stops[0])
-    for stop_name, stID in stops[1].items():
+    text = text + "%d %d %d "%(serviceID,stops[0], stops[1])
+    for stop_name, stID in stops[2].items():
         stopID = stoplist[stoplist['name']==stop_name]['ID'].values[0]
         text = text + "%d %d "%(stopID,stID)
     text = text + "\n"
@@ -206,7 +206,7 @@ headways = np.random.choice(np.arange(100, 1000, 1), size = len(serv_dict))
 # the list of dwell times
 dwelltimes = np.random.choice(np.arange(30, 50, 1), size = len(serv_dict))
 # the list of headway dependent dwell time
-dwelltimes2 = np.random.choice(np.arange(0.1, 1, 0.1), size = len(serv_dict))
+dwelltimes2 = np.random.choice(np.arange(0.01, 0.1, 0.01), size = len(serv_dict))
 # the list of headway dependent dwell time
 widths = np.random.choice(np.arange(0.01, 0.2, 0.01), size = len(serv_dict))
 # this list of biarticulated values

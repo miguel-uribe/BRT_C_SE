@@ -13,12 +13,17 @@ class lineC{
         std::vector<int> stationIDs; // A list of station IDs where the service stops
         std::vector<int> wagons; // A list with the wagon ID at each station where the service stops
         std::vector<int> stopx; // A list with the positions of the stops where the service stops
+        std::vector<int> dts; // A list with the measured headways at the station
+        std::vector<int> times; // A list with the time spent at the station by each bus
         int origin; // The position where buses serving this service are introduced
+        int end; // The position where the service ends
         int headway; // The average headway for the service
         int dwelltime; // The base dwell time for the service
         float dwellhway; // The d (dwelltime)/d(headway) ratio
         float dwellwidth; // the width of the dwell time distribution
         int biart; // percentage of biarticulated buses
+        int lasttime = 0; // The last time a bus arrived at the station
+
         // Dummy constructor
         lineC(){}
         // real constructor
@@ -35,6 +40,7 @@ std::string lineC::display (void){
     std::string text = "Line "+ name;
     text = text + ". Headway: " + std::to_string(headway);
     text = text + ". Origin: " + std::to_string(origin);
+    text = text + ". End: " + std::to_string(end);
     text = text + ". Dwelltime: " + std::to_string(dwelltime);
     text = text + ". Dwelltime/headway: " + std::to_string(dwellhway);
     text = text + ". Dwelltime dist. width: " + std::to_string(dwellwidth);
@@ -55,9 +61,6 @@ void lineC::setstopx(std::vector<int> &STATIONIDS, std::vector<int> &WAGONS, sta
     }
 }
 
-void lineC::setorigin(int ORIGIN){
-    origin = ORIGIN;
-}
 
 
 

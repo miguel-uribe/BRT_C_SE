@@ -16,7 +16,6 @@ struct System
 {
     lineC Lines[NLines];  
     stationC Stations[NStations];
-    int limits[2];
 };
 
 
@@ -47,7 +46,7 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         iss>>read;
         ID = std::stoi(read);
         while(iss>>read){
-            int stoppos = (int) std::stof(read)/Dx;
+            int stoppos = (int) std::round(1.0*std::stoi(read)/Dx);
             iss>>read;
             int biart = std::stoi(read);
             SYSTEM.Stations[ID].addstop(stoppos, biart);
@@ -103,7 +102,10 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         ID = std::stoi(read);
         iss>>read;
         int origin = std::stoi(read);
-        SYSTEM.Lines[ID].setorigin(origin);
+        iss>>read;
+        int end = std::stoi(read);
+        SYSTEM.Lines[ID].origin =(int) std::round(1.0*origin/Dx);
+        SYSTEM.Lines[ID].end = (int) std::round(1.0*end/Dx);
         while(iss>>read){
             int stopID = std::stoi(read);
             iss>>read;

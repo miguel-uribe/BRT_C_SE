@@ -37,10 +37,10 @@ int main (int argc, char **argv){
     //cout<<servicefile<<endl;
     SYSTEM = createsystem(stoplist, stopdefinition, routelist, routedefinition, routeheadways);
 
-
-    for (auto & line: SYSTEM.Stations){
+/*
+    for (auto line: SYSTEM.Lines){
         cout<<line.display()<<endl;
-    }
+    }*/
 
     cout<<"Created the system"<< endl;   
     
@@ -96,25 +96,43 @@ int main (int argc, char **argv){
     int ncounts =0;
     vector<float> bussp;
 
-    
+    /////////////////////////////////////////////////////////
+    // exporting the data
+    string filename, fileroot;
+    fileroot = "./sim_results/sim_results_";
+    // adding the configuration
+    fileroot = fileroot;
+    ofstream printfile;
+    int print = 1;
+    if (print == 1){
+        string filename = fileroot + "_cardata.txt";
+        printfile.open(filename, ios_base::out);
+    }
+
     /////////////////////////////////////////////////////////
     // performing the simulation
     int nbuses = 0;
-    for (int TIME=0; TIME<3600;TIME++){      
+    bool measuring = false;
+    for (int TIME=0; TIME<2*3600;TIME++){      
         // inserting the buses
         //cout<<t<<endl;
-        
+        calculategaps(BusesPar,BusesBool, EL, LC, RC);
+        buschangelane(BusesPar, BusesBool,SYSTEM, LC, RC);
+        calculategaps(BusesPar,BusesBool, EL, LC, RC);
+        busadvance(BusesPar,BusesBool,SYSTEM,TIME, Parked, bussp, cost, V, generator, measuring);
         populate(Parked, BusesPar, SYSTEM, BusesBool, generator, distr, TIME);
         sortbuses(BusesPar,BusesBool, index);
-        /*
-        buschangelane(BusesPar, BusesBool,SYSTEM, TIME);
-        calculategaps(BusesPar,BusesBool);
-        //std::cout<<"Bus advanced in test"<<std::endl;
-        busadvance(BusesPar,BusesBool,SYSTEM,TIME,RM.matrix, Queues, bussp, cost);
-        calculategaps(BusesPar,BusesBool);*/
+        if ((measuring==false) && (TIME >= 3600)){
+            measuring = true;
+        }
+       /* for (int i = 0; i<BusesPar[0].size(); i++){
+            printfile<<TIME<<" ";
+            for (int j = 0; j< Nparam; j++){
+                printfile<<BusesPar[j][i]<<" ";
+            }
+            printfile<<endl;
+        }*/   
     }
-    cout<<Parked.size()<<endl;
-    cout<<BusesPar[0].size()<<endl;
 /*
    // cout<<"Finished the simulation"<< endl;   
 

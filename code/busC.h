@@ -32,6 +32,23 @@ void createbus(std::vector<int>& Parked, int LINEID, System& SYSTEM, std::vector
         BUSESPAR[12].push_back(0); // dwell time
         BUSESPAR[13].push_back(Parked.back()); // The bus ID
         BUSESPAR[14].push_back(TIME); //the initial time
+        if (SYSTEM.Lines[LINEID].biart == 0){
+            BUSESPAR[15].push_back(busL[0]); // The size of the bus
+        }
+        else{
+            int r = (int) std::round(100.0*rand()/RAND_MAX);
+            if (r > SYSTEM.Lines[LINEID].biart){
+                BUSESPAR[15].push_back(busL[0]);}
+            else{
+                BUSESPAR[15].push_back(busL[1]);}
+        }
+        // setting the kind of route
+        if(SYSTEM.Lines[LINEID].wagons.size() > 0){ // if there is a kind assigned to the service
+        BUSESPAR[16].push_back(SYSTEM.Lines[LINEID].wagons[0]); // the kind of route
+        }
+        else{BUSESPAR[16].push_back(-1);};
+
+
         BUSESBOOL[0].push_back(true); //advancing
 
             
@@ -46,7 +63,11 @@ void createbus(std::vector<int>& Parked, int LINEID, System& SYSTEM, std::vector
             BUSESPAR[8].push_back(-1); // the position of the next stop
             BUSESPAR[9].push_back(-1); // next station index
         }
-
+        /*
+        for (int i=0; i<Nparam; i++){
+            std::cout<<BUSESPAR[i].back()<<" ";
+        }
+        std::cout<<std::endl;*/
         // We remove the bus from the parked list
         Parked.pop_back();
     }
@@ -63,7 +84,7 @@ void initializeBusArray(std::vector<int> & PARKED){
     }
 }*/
 
-/*
+
 
 void sortbuses(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], std::vector<int> &index){
 
@@ -76,14 +97,11 @@ void sortbuses(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nb
             std::cout<<idx[i]<<" ";
         }*/
         //sorting indexes
-        /*
+        
         std::sort(idx.begin(),idx.end(),
         [&BUSESPAR](int i1, int i2){
-            if (BUSESPAR[0][i1]==BUSESPAR[0][i2]){ //if the buses are in the same position, the order is given according to the index i2<i1 for acc=1; i2>i1 for axx=-1
-                if (BUSESPAR[10][i1]>0) // if one bus is moving to the east
-                    return i1>i2;
-                else
-                    return i2<i1;
+            if (BUSESPAR[0][i1]==BUSESPAR[0][i2]){ //if the buses are in the same position, the order is given according to the index i2<i1 
+                return i1>i2;
             }
             else{
                 return BUSESPAR[0][i1]<BUSESPAR[0][i2]; // if they are not in the same position, the order is given according to the position
@@ -117,7 +135,7 @@ void sortbuses(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nb
         index = idx;
     }
 }
-
+/*
 // creating a bus
 void createbus(int LINEID, System& SYSTEM, std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], std::deque<int> QUEUES[2], std::vector<int> PARKED[2], int TIME){
     int acc = SYSTEM.Lines[LINEID].acc; // We check the direction of movement
@@ -291,132 +309,89 @@ void transformbus(int busindex, int LINEID, System& SYSTEM, std::vector<int> BUS
         }
     }
 } 
-
-// This function must be called after the bus stops in a given station
+*/
 void updatestop(int index, std::vector<int> BUSESPAR[Nparam], System & SYSTEM){
-    int line=BUSESPAR[11][index];
-    int i=BUSESPAR[15][index]+1; // updating the index to the next station
-    if (i>=SYSTEM.Lines[line].stops.size()){    // in case the final station is reached
-        BUSESPAR[7][index]=BUSESPAR[10][index]*1e6; // we set the next stop to out of bounds
+    int line=BUSESPAR[10][index];
+    int i=BUSESPAR[9][index]+1; // updating the index to the next station
+    if (i>=SYSTEM.Lines[line].stopx.size()){    // in case the final station is reached
+        BUSESPAR[7][index]=1e6; // we set the next stop to out of bounds
         BUSESPAR[8][index]=-1;  // the next station ID
-        BUSESPAR[15][index]=-1;   // the next station index
+        BUSESPAR[9][index]=-1;   // the next station index
     }
     // Otherwise all paraneters are updated
     else{
         BUSESPAR[7][index]=SYSTEM.Lines[line].stopx[i];
         BUSESPAR[8][index]=SYSTEM.Lines[line].stationIDs[i];
-        BUSESPAR[15][index]=i;
-    }
-}
-
-// This function must be called after the bus stops in a given station AND returns to the main lane    
-void updatestationend(int index,std::vector<int> BUSESPAR[Nparam], System& SYSTEM){
-    // getting the bus acceleration
-    int acc = BUSESPAR[10][index];
-    // if the bus is departing the final station, the nextstop is out of bounds
-    if (acc*BUSESPAR[7][index]>SYSTEM.limits[1]){
-        // then, the next station end is also out of bounds
-        BUSESPAR[9][index]=acc*1e6;
-    }
-    else{// if there is a next station
-        int nextSt = BUSESPAR[8][index]; // the next station ID
-        int accpar =int((acc+1)/2); // 0 for west, 1 for east
-        // the next station end is updated using the accpar parameter
-        BUSESPAR[9][index]=SYSTEM.Stations[nextSt].x + accpar*((Nw-1)*Ds+Dw)+acc*2*Db;
+        BUSESPAR[9][index]=i;
     }
 }
 
 // This function calculates the forward gaps for all buses
-void calculategaps(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool]){
+void calculategaps(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> EL,  std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> LC,  std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> RC){
+    int x,y,kind;
     int lme=-1; // last main east
     int lse=-1; // last stopping east
-    int lmw=-1; // last main west
-    int lsw=-1; // last stopping west
 
     // now we proceed to scan all buses from east to west
     for (int i=0; i<BUSESPAR[0].size(); i++){
-        if (BUSESPAR[10][i]>0){ //Buses moving to the east
-            // Buses in the main lane
-            if(BUSESPAR[1][i]==0){
-                //the default gap corresponds to the next stop, cannot be negative
-                BUSESPAR[3][i]=std::max(BUSESPAR[7][i]-AZ-BUSESPAR[0][i],0);
-                // now we check for possible buses
-                if (lme>=0){ // if already a bus has been found in the main lane to the east
-                    // we update the gap for the bus behind, cannot be negative
-                    BUSESPAR[3][lme]=std::max(std::min(BUSESPAR[3][lme],BUSESPAR[0][i]-BUSESPAR[0][lme]-Db),0);
-                }
-                // now we update the last index
-                lme=i;
-            }
-            else { // Buses in the stopping lane
-                // The default gap corresponds to the next station or next station end, cannot be negative
-                BUSESPAR[3][i]=std::max(std::min(BUSESPAR[7][i],BUSESPAR[9][i])-BUSESPAR[0][i],0);
-                // If it is not the first bus found in the stopping lane
-                if (lse>=0){
-                    // we set the gap for the bus behind
-                    BUSESPAR[3][lse]=std::max(std::min(BUSESPAR[3][lse],BUSESPAR[0][i]-BUSESPAR[0][lse]-Db),0);
-                }
-                
-                // now checking if gaps must be changed to surrender priority
-                if ((BUSESBOOL[0][i]==true) && (BUSESPAR[3][i]==0)){ // if the bus is willing to change, but it's stuck
-                    // We find the distance to the last bus in the main lane
-                    if(lme>=0){ //only if there are already buses found
-                        int gap = BUSESPAR[0][i]-BUSESPAR[0][lme]-Db;
-                        if((gap>0) && (gap<=Db) && (BUSESPAR[2][lme]<=3)){
-                            BUSESPAR[3][lme]=0;
-                        }
-                    }
-                }
-                // we finally update the index
-                lse=i;
-            }
-        }
-        else if(BUSESPAR[10][i]<0){ //Buses moving to the west
-            // Buses in the main lane
-            if(BUSESPAR[1][i]==0){
-                //the default gap corresponds to the next stop, cannot be positive
-                BUSESPAR[3][i]=std::min(BUSESPAR[7][i]+AZ-BUSESPAR[0][i],0);
-                // now we check for possible buses
-                if (lmw>=0){ // if already a bus has been found in the main lane to the east
-                    // we update the gap for the current bus, cannot be positive
-                    BUSESPAR[3][i]=std::min(std::max(BUSESPAR[3][i],BUSESPAR[0][lmw]-BUSESPAR[0][i]+Db),0);
-                }
-                
-                
-                // in case there is a bus that needs to be surrendered priority
-                if (lsw>=0){
-                    if ((BUSESBOOL[0][lsw]==true) && (BUSESPAR[3][lsw]==0)){ // if the bus is willing to change, but it's stuck
-                        int gap = BUSESPAR[0][i]-BUSESPAR[0][lsw]-Db;
-                        if((gap>0) && (gap<=Db) && (BUSESPAR[2][i]>=-3)){
-                            BUSESPAR[3][i]=0;
-                        }
-                    }
-                }
+        x = BUSESPAR[0][i];
+        y = BUSESPAR[1][i];
+        kind = BUSESPAR[16][i];
 
-                // now we update the last index
-                lmw=i;
+        // Buses in the main lane
+        if(BUSESPAR[1][i]==0){
+            //the default gap corresponds to the next end of lane, cannot be negative
+            if(kind >=0){
+                BUSESPAR[3][i]=std::max(EL[kind][y][x],0);
             }
-            else { // Buses in the stopping lane
-                // The default gap corresponds to the next station or next station end, cannot be positive
-                BUSESPAR[3][i]=std::min(std::max(BUSESPAR[7][i],BUSESPAR[9][i])-BUSESPAR[0][i],0);
-                // If it is not the first bus found in the stopping lane
-                if (lsw>=0){
-                    // we set the gap for the current bus, cannot be positive
-                    BUSESPAR[3][i]=std::min(std::max(BUSESPAR[3][i],BUSESPAR[0][lsw]-BUSESPAR[0][i]+Db),0);
+            else{BUSESPAR[3][i]=1000;}
+            // now we check for possible buses
+            if (lme>=0){ // if already a bus has been found in the main lane to the east
+                // we update the gap for the bus behind, cannot be negative
+                BUSESPAR[3][lme]=std::max(std::min(BUSESPAR[3][lme],BUSESPAR[0][i]-BUSESPAR[0][lme]-BUSESPAR[15][i]),0);
+            }
+            // now checking if gaps must be changed to surrender priority
+            if ((BUSESPAR[3][i]==0) && (LC[kind][y][x]==1)){ // if the bus is willing to change, but it's stuck
+                // We find the distance to the last bus in the stopping lane 
+                if(lse>=0){ //only if there are already buses found
+                    int gap = BUSESPAR[0][i]-BUSESPAR[0][lse]-BUSESPAR[15][i];
+                    if((gap>0) && (gap<=BUSESPAR[15][i]) && (BUSESPAR[2][lse]<=vsurr)){
+                        BUSESPAR[3][lse]=0;
+                    }
                 }
-                // now we update the last index
-                lsw=i;
             }
+            // now we update the last index
+            lme=i;
+        }
+        else { // Buses in the stopping lane
+            // The default gap corresponds to the next station or next lane end, cannot be negative
+            BUSESPAR[3][i]=std::max(std::min(BUSESPAR[7][i]-BUSESPAR[0][i],EL[kind][y][x]),0);
+            // If it is not the first bus found in the stopping lane
+            if (lse>=0){
+                // we set the gap for the bus behind
+                BUSESPAR[3][lse]=std::max(std::min(BUSESPAR[3][lse],BUSESPAR[0][i]-BUSESPAR[0][lse]-BUSESPAR[15][i]),0);
+            }
+            
+            // now checking if gaps must be changed to surrender priority
+            if ((BUSESPAR[3][i]==0) && (RC[kind][y][x]==1)){ // if the bus is willing to change, but it's stuck
+                // We find the distance to the last bus in the main lane
+                if(lme>=0){ //only if there are already buses found
+                    int gap = BUSESPAR[0][i]-BUSESPAR[0][lme]-BUSESPAR[15][i];
+                    if((gap>0) && (gap<=BUSESPAR[15][i]) && (BUSESPAR[2][lme]<=vsurr)){
+                        BUSESPAR[3][lme]=0;
+                    }
+                }
+            }
+            // we finally update the index
+            lse=i;
         }
     }
    // std::cout<<"calculated gaps"<<std::endl;
 }
 
+
 // the function to be called when attempting to change lane to calculate the lateral gaps
 void gapsl(int index, std::vector<int> BUSESPAR[Nparam]){
-    int acc = BUSESPAR[10][index];
-    int accC = int((acc+1)/2);    //1 for east, 0 for west
-    int accP = (accC+1)%2;           //0 for east, 1 for west
 
     // the default gaps
     int gaps[]={1000,-1000}; // east, west
@@ -429,18 +404,17 @@ void gapsl(int index, std::vector<int> BUSESPAR[Nparam]){
     // GAP TO THE EAST
     int checks=1;
     while((checks<=ncheck) && ((index+checks)<BUSESPAR[0].size())){    
+        
         // we get the gap
-        int gap = BUSESPAR[0][index+checks]-BUSESPAR[0][index]-Db; // this is positive
-        if (gap<=(2*vmax)){// we only consider buses with a gap lower than 2*vmax
-            // the bus in the same direction
-            // the bus is in the opposite plane
-
-            if((BUSESPAR[10][index+checks]==acc) && (BUSESPAR[1][index+checks]==opplane)){
+        int gap = BUSESPAR[0][index+checks]-BUSESPAR[0][index]-BUSESPAR[15][index+checks]; // this is positive
+        // only if the gap is lower than two times the length of the biarticulated buses
+        if(gap <= (2*busL[1])){
+            if(BUSESPAR[1][index+checks]==opplane){
+                // the bus is in the opposite plane
                 gaps[0]=gap;
-                // in addition if the bus is moving to the west, we set vbef
-                if (acc<0){vbef = BUSESPAR[2][index+checks];}
                 break;
             }  
+            
         }
         else{ // the rest of buses are further away, we stop
             break;
@@ -452,15 +426,14 @@ void gapsl(int index, std::vector<int> BUSESPAR[Nparam]){
     checks=-1;
     while((checks>=-ncheck) && ((index+checks)>=0)){
         // we get the gap
-        int gap = BUSESPAR[0][index+checks]-BUSESPAR[0][index]+Db; // this is negative
-        if (gap>=-(2*vmax)){// we only consider buses with a gap lower than 2*vmax
-            // the bus in the same direction
-            // the bus is in th e opposite plane
-
-            if((BUSESPAR[10][index+checks]==acc) && (BUSESPAR[1][index+checks]==opplane)){
+        int gap = BUSESPAR[0][index+checks]-BUSESPAR[0][index]+BUSESPAR[15][index]; // this is negative
+        // only if the gap is lower than two times the length of the biarticulated buses
+        if (gap>=-(2*busL[1])){
+            // the bus is in the opposite plane
+            if(BUSESPAR[1][index+checks]==opplane){
                 gaps[1]=gap;
-                // in addition if the bus is moving to the east, we set vbef
-                if (acc>0){vbef = BUSESPAR[2][index+checks];}
+                // in addition, we set vbef
+                vbef = BUSESPAR[2][index+checks];
                 break;
             }  
         }
@@ -469,164 +442,138 @@ void gapsl(int index, std::vector<int> BUSESPAR[Nparam]){
         }
         checks--;
     }
-    BUSESPAR[4][index]=gaps[accP];
-    BUSESPAR[5][index]=gaps[accC];
+    BUSESPAR[4][index]=gaps[0];
+    BUSESPAR[5][index]=gaps[1];
     BUSESPAR[6][index]=vbef;
-
-
 }
 
 
 // This function creates all the line changes in the system   
-void buschangelane(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, int TIME){
+void buschangelane(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> LC, std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> RC){
+    int x, y, kind;
     // Change from the main lane to the stopping lane
     std::vector<int> newy = BUSESPAR[1]; // by default, the bus stays in the same lane
     for (int i=0; i<BUSESPAR[0].size(); i++){
-        // only buses changing are considered
-        if (BUSESBOOL[0][i]==true){
-            // buses in the main lane
-            if (BUSESPAR[1][i]==0){
-                // buses in the approximation zone
-                int dist = int(BUSESPAR[10][i]*(BUSESPAR[7][i]-BUSESPAR[0][i])-AZ); // this is always positive
-                if (dist<Dc){
-                    // we calculate the gaps
-                    gapsl(i, BUSESPAR);
-                    // If the gaps satisfy the following conditions
-                    if ((-BUSESPAR[10][i]*BUSESPAR[5][i]>BUSESPAR[10][i]*BUSESPAR[6][i]) // -acc*gapbl > acc*vbef
-                    && (BUSESPAR[10][i]*BUSESPAR[4][i]>BUSESPAR[10][i]*BUSESPAR[2][i])){ // acc*gapfl > v*acc
+        
+        // the bus parameters
+        x = BUSESPAR[0][i];
+        y = BUSESPAR[1][i];
+        kind = BUSESPAR[16][i];
+        // only for buses with stops
+        if (kind >= 0){
+            // Change to the stopping lane
+            if (LC[kind][y][x]==1){
+                // we calculate the gaps
+                gapsl(i, BUSESPAR);
+                // If the gaps satisfy the following conditions
+                if ((-BUSESPAR[5][i]>BUSESPAR[6][i]) // -gapbl > vbef
+                    && (BUSESPAR[4][i]>BUSESPAR[2][i]) // gapfl > v
+                    && (BUSESPAR[4][i]>BUSESPAR[3][i]) // gapfl > gapf
+                    ){ 
                         // the lane is changed
                         newy[i] = 1;
-                        // the changing state is also changed
-                        BUSESBOOL[0][i]=false;
-                        //std::cout<<"changed lane"<<std::endl;
-                    }
                 }
             }
-            // Buses in the stopping lane
-            else if(BUSESPAR[1][i]==1){
-                // bus has spent some time since departure
-                // there is an obstacle in front acc*gapf <= 2*vmax 
-                if (((TIME-BUSESPAR[12][i])>5) && (BUSESPAR[10][i]*BUSESPAR[3][i]<=2*vmax)){
-                    // we calculate the gaps
-                    gapsl(i, BUSESPAR);
-                    // If the gaps satisfy the following conditions
-                    if ((-BUSESPAR[10][i]*BUSESPAR[5][i]>BUSESPAR[10][i]*BUSESPAR[6][i]) // -acc*gapbl > acc*vbef
-                    && (BUSESPAR[10][i]*BUSESPAR[4][i]>BUSESPAR[10][i]*BUSESPAR[2][i])){ // acc*gapfl > v*acc
-                        // the lane is changed
-                        newy[i] = 0;
-                        updatestationend(i, BUSESPAR, SYSTEM);
-                        //std::cout<<"changed lane"<<std::endl;
-                    }
+                
+            // Change to the main lane
+            if(RC[kind][y][x]==1){
+                
+                // If the gaps satisfy the following conditions
+                if ((-BUSESPAR[5][i]>BUSESPAR[6][i]) // -acc*gapbl > acc*vbef
+                && (BUSESPAR[4][i]>BUSESPAR[2][i])){ // acc*gapfl > v*acc
+                    // the lane is changed
+                    newy[i] = 0;
                 }
             }
         }
-        // Now we update all the lanes
-        BUSESPAR[1]=newy;
-        
     }
+    // Now we update all the lanes
+    BUSESPAR[1]=newy;
+    
     //std::cout<<"Changed lane"<<std::endl;
 }
 
 
 // making the buses move
-void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, int TIME,  int &NACTIVEPASS,  float & PASSSP, std::vector<int> BUSPASSENGERS[fleet], std::vector<int> STPASSENGERS[NStations], std::vector<std::array<int, nparpass>> & PASSENGERS, std::vector<routeC> MATRIX[NStations][NStations], std::deque<int> QUEUES[2], std::vector<int> PARKED[2], std::vector<float> &bussp, float & cost){
-
+void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, int TIME, std::vector<int> &PARKED, std::vector<float> &bussp, float & cost, std::array<std::array<int, 2*L>, Nmax> V, std::default_random_engine &generator, bool measuring){
+    int x,y, lineID, dt;
+    float prand, mean, std;
     //std::cout<<"Bus advanced "<<BUSESPAR[0].size()<<std::endl;
     // we scan over all buses
     std::vector<int> toremove;
     for (int i =0; i<BUSESPAR[0].size(); i++){
+        x = BUSESPAR[0][i];
+        y = BUSESPAR[1][i];
         // buses advancing
-        if (BUSESBOOL[1][i]==true){
+        if (BUSESBOOL[0][i]==true){
+            // we implement the VDR-TCA model of Maerivoet
+            // we determine the randomization parameter depending on the speed
+            if (BUSESPAR[2][i]==0)
+                prand = p0;
+            else
+                prand = p;
             // we calculate the new speed, vnew=acc*min(acc*(v+acc),acc*gap,acc*vmax)
-            BUSESPAR[2][i]=BUSESPAR[10][i]*std::min(BUSESPAR[10][i]*(BUSESPAR[2][i]+BUSESPAR[10][i]),std::min(BUSESPAR[10][i]*BUSESPAR[3][i],vmax));
-            // if the speed is larger than one
-            if(abs(BUSESPAR[2][i])>0){
-                // we apply the randomization
-                float r = ((double) rand() / (RAND_MAX));
-                if (r<p){BUSESPAR[2][i]= BUSESPAR[2][i]-BUSESPAR[10][i];}
-            }
+            BUSESPAR[2][i]=std::min((BUSESPAR[2][i]+1),std::min(BUSESPAR[3][i],V[y][x]));
+            // we apply the randomization
+            float r = ((float) rand() / (RAND_MAX));
+            if (r<prand){BUSESPAR[2][i] = std::max(0,BUSESPAR[2][i]-1);}
             // now we update the position
             BUSESPAR[0][i]=BUSESPAR[0][i]+BUSESPAR[2][i];
             // checking whether the bus reaches a stop
             if (BUSESPAR[0][i]==BUSESPAR[7][i]){
-                // we set the speed, advancing and stoptime to cero
+                // we set the speed, advancing and stoptime to zero
                 BUSESPAR[2][i]=0;
-                BUSESBOOL[1][i]=false;
-                BUSESPAR[13][i]=0;
+                BUSESBOOL[0][i]=false;
+                BUSESPAR[11][i]=0;
                 // we board and alight passengers, and set the dwell time
-                busdata results;
-                results=busArriving(BUSESPAR[17][i],BUSESPAR[8][i],BUSESPAR[11][i],TIME,NACTIVEPASS,PASSSP,BUSPASSENGERS,STPASSENGERS,PASSENGERS,MATRIX, SYSTEM, BUSESPAR[16][i]);
-                BUSESPAR[14][i] = results.dwelltime;
-                BUSESPAR[16][i] = results.busoccupation;
+                lineID = BUSESPAR[10][i];
+                if (SYSTEM.Lines[lineID].lasttime>0){ // if this is not the first bus
+                    dt = TIME - SYSTEM.Lines[lineID].lasttime; // we calculate the headway
+                    //std::cout<<dt<<std::endl;
+                    if(measuring==true){ // only if we are measuring
+                        //std::cout<<"here"<<std::endl;
+                        SYSTEM.Lines[lineID].dts.push_back(dt); //we add the headway to the list
+                    }
+                }
+                else{ // For the first bus we do not count
+                    dt = 0; // Default value
+                }
+                mean = SYSTEM.Lines[lineID].dwelltime + dt*SYSTEM.Lines[lineID].dwellhway; // the nominal dwell time
+                std = mean*SYSTEM.Lines[lineID].dwellwidth;  // the width of the distribution
+                std::normal_distribution<double> distribution(mean,std); // we define the distribution
+                // we generate the dwell time
+                do{
+                    BUSESPAR[12][i] = (int) distribution(generator);
+                    //std::cout<<"try "<<dt<<" "<<mean<<" "<<std<<" "<<BUSESPAR[12][i]<<std::endl;
+                }while(BUSESPAR[12][i]<10);
+                // we add the headway to the list
+                
+                //std::cout<<dt<<" "<<mean<<" "<<std<<" "<<BUSESPAR[12][i]<<std::endl;
                 // we update the stop information
                 updatestop(i,BUSESPAR,SYSTEM);
+                // We update the last stop information
+                SYSTEM.Lines[lineID].lasttime = TIME;
             }
 
             // checking whether the bus leaves the system
-            else if (BUSESPAR[0][i]<SYSTEM.limits[0]){
+            else if (BUSESPAR[0][i]>SYSTEM.Lines[BUSESPAR[10][i]].end){
                 //We add the speed of the bus to the list
-                bussp.push_back(float(SYSTEM.limits[1]-BUSESPAR[0][i])/(TIME-BUSESPAR[18][i]));
-               // std::cout<<"////"<<BUSESPAR[17][i]<<" "<<bussp.back()<<std::endl;
-
+                bussp.push_back(float(BUSESPAR[0][i]-SYSTEM.Lines[BUSESPAR[10][i]].origin)/(TIME-BUSESPAR[14][i]));///
                 // we update the cost value
-                cost+=TIME-BUSESPAR[18][i];
-                // we check whether there are people in the bus
-                int occ=BUSESPAR[16][i];
-                if (occ>0){
-                    std::cout<<"WARNING!! A bus reached the end of the system with passengers on board"<<std::endl;
-                }
-                // we check whether there are buses in the queue 
-                if (!QUEUES[0].empty()){
-                    // we transform the bus
-                    transformbus(i,QUEUES[0][0],SYSTEM,BUSESPAR,BUSESBOOL,QUEUES, TIME);
-
-                    // we remove the first element of the queue
-                    QUEUES[0].pop_front();
-                }
-                else{ // if there are no queues, the bus is removed and added to the parked list
-                    toremove.push_back(i);
-                    PARKED[0].push_back(BUSESPAR[17][i]);
-
-                }
-            }
-            // checking whether the bus leaves the system
-            else if (BUSESPAR[0][i]>SYSTEM.limits[1]){
-                //We add the speed of the bus to the list
-                bussp.push_back(float(BUSESPAR[0][i]-SYSTEM.limits[0])/(TIME-BUSESPAR[18][i]));///(TIME-BUSESPAR[18][i]));
-                //std::cout<<"////"<<BUSESPAR[17][i]<<" "<<bussp.back()<<std::endl;
-                // we update the cost value
-                cost+=TIME-BUSESPAR[18][i];
-                // we check whether there are people in the bus
-                int occ=BUSESPAR[16][i];
-                if (occ>0){
-                    std::cout<<"WARNING!! A bus reached the end of the system with passengers on board"<<std::endl;
-                }
-                // we check whether there are buses in the queue 
-                if (!QUEUES[1].empty()){
-                    // we create the bus
-                    transformbus(i,QUEUES[1][0],SYSTEM,BUSESPAR,BUSESBOOL,QUEUES, TIME);
-
-                    // we remove the first element of the queue
-                    QUEUES[1].pop_front();
-                }
-                else{ // if there are no queues, the bus is removed and added to the parked list
-                    toremove.push_back(i);
-                    PARKED[1].push_back(BUSESPAR[17][i]);
-
-                }
+                cost+=TIME-BUSESPAR[14][i];
+                //  the bus is removed and added to the parked list
+                toremove.push_back(i);
+                PARKED.push_back(BUSESPAR[13][i]);
             }
         }
         // if the bus is not advancing
         else{
             //the stop time is increased by one
-            BUSESPAR[13][i]=BUSESPAR[13][i]+1;
+            BUSESPAR[11][i]=BUSESPAR[11][i]+1;
             // we check that the stopping time is equal or larger than the dwell time
-            if (BUSESPAR[13][i]>=BUSESPAR[14][i]){
+            if (BUSESPAR[11][i]>=BUSESPAR[12][i]){
                 // twe update the changing and the advancing
                 BUSESBOOL[0][i]=true;
-                BUSESBOOL[1][i]=true;
-                // we update the last stop time
-                BUSESPAR[12][i]=TIME;
             }
         }   
 
@@ -643,14 +590,9 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
         }
         toremove.pop_back();
     }
-
-
 }
 
-// 
 
-
-*/
 
 // inserting the buses in the system
 void populate(std::vector<int>& Parked, std::vector<int> BUSESPAR[Nparam], System& SYSTEM, std::vector<bool> BUSESBOOL[Nbool], std::default_random_engine &generator, std::vector<std::poisson_distribution<int>> distr, int time){
