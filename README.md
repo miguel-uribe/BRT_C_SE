@@ -1,5 +1,10 @@
 # BRT_C_SE
-C++ and Python programming scheme to simulate and optimize the behaviour of a single BRT station. The complete station geometry is inspired by the Calle 100 station of TransMilenio in Bogotá, Colombia
+C++ and Python programming scheme to simulate and optimize the behaviour of a single BRT station. The complete station geometry is inspired by the Calle 100 station of TransMilenio in Bogotá, Colombia.
+
+# Compiling the C++ program
+This code is meant to be compiled in a machine running the Linux operating system or a WLS. To compile the code, `gcc` must support the `C++17` standard. The code to compile the code must be executed in the directory where the `simulation.cpp` file is, it reads like this:
+
+`g++ -O2 simulation.cpp -o simulation`
 
 
 ## Input files
@@ -26,9 +31,11 @@ This file containg the information about the stops of a bus service, each line m
 - `int` The service ID, which must be the same than in the `servicelist.txt` file.
 - `int` The point where the buses servicing this line will appear in the system.
 - `int` The point where the buses reach the end of the service. When buses overcome this point they are automatically added to the parked list.
+- `int` The point where the observation window for this service starts. The observation window is used to determine the time spent by the bus at the station.
+- `int` The point where the observation window for this service ends. 
 - Next, a succession of pairs `int` `int` will appear for each station where the service makes a stop. The first integer number corresponds to the ID of the station, the second corresponds to the ID of the door at the station where the bus will make the stop. The ID of the doors are assigned according to their appearance in the stopdefinition file, the first door will have ID 0, the second will have ID 1 and so on.
 
-### conf/servicedetails.txt
+### conf/servicedata.txt
 This file contains the detailed information about each of the bus services in the system. Each line represents a bus service and must contain the following information separated by a space:
 - `int` The service ID, which must be the same than in the `servicelist.txt` file.
 - `int` the average service headway, $h$, in seconds. At each time step, the buses will be introduced into the system using a Poisson distribution with the headway as the mean.
@@ -57,3 +64,4 @@ These are the end of lane files, here each column represents a lane (0, main lan
 
 ### conf/V.txt
 This is the maximum speed file, here each column represents a lane (0, main lane; 1, stopping lane), each row represents a cell along the corridor. The value in each row-column corresponds to the maximum speed, in m/s, at the current position.
+

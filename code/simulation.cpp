@@ -140,11 +140,7 @@ int main (int argc, char **argv){
             if(print==1){
                 if (TIME >= 3600){
                     for (int i = 0; i<BusesPar[0].size(); i++){
-                        printfile<<TIME<<" ";
-                        for (int j = 0; j< Nparam; j++){
-                            printfile<<BusesPar[j][i]<<" ";
-                        }
-                        printfile<<endl;
+                        printfile<<TIME<<" "<<BusesPar[0][i]<<" "<<BusesPar[1][i]<<" "<<BusesPar[10][i]<<" "<<BusesPar[13][i]<<endl;
                     }  
                 }
             }
