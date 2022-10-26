@@ -53,14 +53,14 @@ for wagon in np.arange(6):
     # correcting for the information provided in route_conf
     for rule in LCR:
         if rule[0]=='LNA':
-            lanes[int(rule[2]/Dx):int(rule[3]/Dx)+1,rule[1]] = 0
+            lanes[round(rule[2]/Dx):round(rule[3]/Dx)+1,rule[1]] = 0
 
     # creating the maximal speed file, this is a number with the information regarding the maximal speed per lane and per position
     V = (vmax*Dt/Dx)*np.ones((2*L,Nmax))  # by default the maximal speed is the same along the entire corridor
     # now we chech for possible maximal speed rules
     for rule in LCR:
         if rule[0]=='VM':
-            V[int(rule[2]/Dx):int(rule[3]/Dx)+1,rule[1]] = rule[4]*Dt/Dx
+            V[round(rule[2]/Dx):round(rule[3]/Dx)+1,rule[1]] = rule[4]*Dt/Dx
 
     # Now we create the leftchange file, containing the information regarding the posibility to change the lane to the left, this is increasing the lane. 0 means change is not possible, 1 means change is possible
     LC = np.copy(lanes)
@@ -80,12 +80,12 @@ for wagon in np.arange(6):
     # now we check for possible special lane changing arrangements
     for rule in LCR:
         if rule[0]=='LSB':
-            LC[int(rule[2]/Dx):int(rule[3]/Dx)+1,rule[1]] = 0
-            RC[int(rule[2]/Dx):int(rule[3]/Dx)+1,rule[1]+1] = 0
+            LC[round(rule[2]/Dx):round(rule[3]/Dx)+1,rule[1]] = 0
+            RC[round(rule[2]/Dx):round(rule[3]/Dx)+1,rule[1]+1] = 0
         if rule[0]=='LSR':
-            RC[int(rule[2]/Dx):int(rule[3]/Dx)+1,rule[1]] = 0
+            RC[round(rule[2]/Dx):round(rule[3]/Dx)+1,rule[1]] = 0
         if rule[0]=='LSL':
-            LC[int(rule[2]/Dx):int(rule[3]/Dx)+1,rule[1]] = 0
+            LC[round(rule[2]/Dx):round(rule[3]/Dx)+1,rule[1]] = 0
 
     # Finally we create the endoflane where a number marks the distance to the end of the lane, by default this is set as 1000
 
@@ -120,6 +120,12 @@ for wagon in np.arange(6):
 file = os.path.join(dirname,"../conf/V.txt")
 np.savetxt(file,V, fmt ='%d')  # the speed
 
+
+initST = np.around((np.where(lanes[:,1]-np.roll(lanes[:,1], 1)==1)[0])/Dx).astype(int)
+endST =np.around((np.where(lanes[:,1]-np.roll(lanes[:,1], 1)==-1)[0])/Dx).astype(int)
+print(initST)
+print(endST)
+
 # %%
 # Creating a file with the definition of all stops in the system
 stop_definition = ['Calle_100_N', 'Calle_100_S']
@@ -150,21 +156,21 @@ file.close()
 # %%
 # Creating a file with the configuration of each service:
 
-serv_dict = {   '8N': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
-                '8S': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
-                'C50': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
-                'D10': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
-                'F14': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
-                'G12': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
-                'H13': [bL+L,2*L,{'Calle_100_S': np.random.choice(range(6))}],
-                'B13': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
-                'B71': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
-                'B12': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
-                'B14': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
-                'B10': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
-                'B50': [bL,L,{'Calle_100_N': np.random.choice(range(6))}],
-                'GenS': [bL+L,2*L,{}],
-                'GenN': [bL,L,{}]
+serv_dict = {   '8N': [bL,L,initST[0],endST[0],{'Calle_100_N': np.random.choice(range(6))}],
+                '8S': [bL+L,2*L,initST[1],endST[1],{'Calle_100_S': np.random.choice(range(6))}],
+                'C50': [bL+L,2*L,initST[1],endST[1],{'Calle_100_S': np.random.choice(range(6))}],
+                'D10': [bL+L,2*L,initST[1],endST[1],{'Calle_100_S': np.random.choice(range(6))}],
+                'F14': [bL+L,2*L,initST[1],endST[1],{'Calle_100_S': np.random.choice(range(6))}],
+                'G12': [bL+L,2*L,initST[1],endST[1],{'Calle_100_S': np.random.choice(range(6))}],
+                'H13': [bL+L,2*L,initST[1],endST[1],{'Calle_100_S': np.random.choice(range(6))}],
+                'B13': [bL,L,initST[0],endST[0],{'Calle_100_N': np.random.choice(range(6))}],
+                'B71': [bL,L,initST[0],endST[0],{'Calle_100_N': np.random.choice(range(6))}],
+                'B12': [bL,L,initST[0],endST[0],{'Calle_100_N': np.random.choice(range(6))}],
+                'B14': [bL,L,initST[0],endST[0],{'Calle_100_N': np.random.choice(range(6))}],
+                'B10': [bL,L,initST[0],endST[0],{'Calle_100_N': np.random.choice(range(6))}],
+                'B50': [bL,L,initST[0],endST[0],{'Calle_100_N': np.random.choice(range(6))}],
+                'GenS': [bL+L,2*L,initST[1],endST[1],{}],
+                'GenN': [bL,L,initST[0],endST[0],{}]
              }
 
 # We now print the file with the service list
@@ -185,8 +191,8 @@ stoplist = pd.read_csv('../conf/stoplist.txt', names = ['ID', 'name'], sep = " "
 servicelist = pd.read_csv('../conf/servicelist.txt', names = ['ID', 'name'], sep = " ")
 for service_name, stops in serv_dict.items():
     serviceID = servicelist[servicelist['name']==service_name]['ID'].values[0]
-    text = text + "%d %d %d "%(serviceID,stops[0], stops[1])
-    for stop_name, stID in stops[2].items():
+    text = text + "%d %d %d %d %d "%(serviceID,stops[0], stops[1], stops[2], stops[3])
+    for stop_name, stID in stops[4].items():
         stopID = stoplist[stoplist['name']==stop_name]['ID'].values[0]
         text = text + "%d %d "%(stopID,stID)
     text = text + "\n"

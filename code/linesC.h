@@ -23,6 +23,8 @@ class lineC{
         float dwellwidth; // the width of the dwell time distribution
         int biart; // percentage of biarticulated buses
         int lasttime = 0; // The last time a bus arrived at the station
+        int measBeg; // the starting point of the measurement window
+        int measEnd; // the ending point of the measurement window
 
         // Dummy constructor
         lineC(){}

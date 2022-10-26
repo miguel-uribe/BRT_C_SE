@@ -48,7 +48,7 @@ void createbus(std::vector<int>& Parked, int LINEID, System& SYSTEM, std::vector
         }
         else{BUSESPAR[16].push_back(-1);};
 
-
+        BUSESPAR[17].push_back(0); // the time spent by the bus at the measurement window
         BUSESBOOL[0].push_back(true); //advancing
 
             
@@ -57,11 +57,12 @@ void createbus(std::vector<int>& Parked, int LINEID, System& SYSTEM, std::vector
             BUSESPAR[7].push_back(SYSTEM.Lines[LINEID].stopx[0]); // the position of the next stop
             BUSESPAR[8].push_back(SYSTEM.Lines[LINEID].stationIDs[0]); // the ID of the next station
             BUSESPAR[9].push_back(0); // next station index
+            
         }
         else{ // the nonstop buses
             BUSESPAR[7].push_back(1e6); // the position of the next stop
             BUSESPAR[8].push_back(-1); // the position of the next stop
-            BUSESPAR[9].push_back(-1); // next station index
+            BUSESPAR[9].push_back(-1); // next station index    
         }
         /*
         for (int i=0; i<Nparam; i++){
@@ -76,13 +77,7 @@ void createbus(std::vector<int>& Parked, int LINEID, System& SYSTEM, std::vector
         std::cout<<"WARNING! There entire fleet is used, please increase the fleet number"<<std::endl; 
     }
 } 
-/*
-void initializeBusArray(std::vector<int> & PARKED){
-    for (int i=0; i<fleet; i++){
-        PARKED.push_back(i);
-        
-    }
-}*/
+
 
 
 
@@ -135,181 +130,7 @@ void sortbuses(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nb
         index = idx;
     }
 }
-/*
-// creating a bus
-void createbus(int LINEID, System& SYSTEM, std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], std::deque<int> QUEUES[2], std::vector<int> PARKED[2], int TIME){
-    int acc = SYSTEM.Lines[LINEID].acc; // We check the direction of movement
-    //std::cout<<"Creating bus for service "<<LINEID<<" with acceleration "<<acc<<std::endl;
-    if (acc>0){ // buses moving in the east direction   
-        // we check whether there are buses available
-        if (!PARKED[0].empty()){ // if there are indeed buses available
-            // we append the bus parameters at the end 
-            BUSESPAR[0].push_back(SYSTEM.limits[0]); //position
-            BUSESPAR[1].push_back(0); // lane
-            BUSESPAR[2].push_back(0); // speed
-            BUSESPAR[3].push_back(0); // gapf
-            BUSESPAR[4].push_back(0); // gapfl
-            BUSESPAR[5].push_back(0); // gapbl
-            BUSESPAR[6].push_back(0); //vbef
-            BUSESPAR[10].push_back(acc); // acceleration
-            BUSESPAR[11].push_back(LINEID); //lineID
-            BUSESPAR[12].push_back(0); //laststoptime
-            BUSESPAR[13].push_back(0); // stoptime
-            BUSESPAR[14].push_back(0); // dwell time
-            BUSESPAR[16].push_back(0); // bus occupation
-            BUSESPAR[17].push_back(PARKED[0].back()); // The bus is
-            BUSESPAR[18].push_back(TIME); //the initial time
-    
-            BUSESBOOL[0].push_back(true); //changing
-            BUSESBOOL[1].push_back(true); //advancing
 
-            //std::cout<<"Created bus for "<<LINEID<<" at time "<<TIME<<" with acceleration "<<acc<<std::endl;
-
-            // we retrieve the first stop information
-            if (SYSTEM.Lines[LINEID].stopx.size()>0){ // in case there are stops
-                BUSESPAR[7].push_back(SYSTEM.Lines[LINEID].stopx[0]);
-                BUSESPAR[8].push_back(SYSTEM.Lines[LINEID].stationIDs[0]);
-                BUSESPAR[9].push_back(SYSTEM.Stations[BUSESPAR[8].back()].x+(Nw-1)*Ds+Dw+2*Db);
-                BUSESPAR[15].push_back(0); // next station index
-            }
-            else{ // the nonstop buses
-                BUSESPAR[7].push_back(1e6);
-                BUSESPAR[8].push_back(-1);
-                BUSESPAR[9].push_back(1e6);
-                BUSESPAR[15].push_back(-1);
-            }
-            // We remove the bus from the parking list
-            PARKED[0].pop_back();
-        }
-        else{  // if there are no buses available, we introduce the bus to the queue
-            QUEUES[0].push_back(LINEID);
-        }
-    }
-    else if (acc<0){ //Buses moving in the west direction
-        // we check whether there are buses available
-        if (!PARKED[1].empty()){ // if there are indeed buses available
-            
-            BUSESPAR[0].push_back(SYSTEM.limits[1]); //position
-            BUSESPAR[1].push_back(0); // lane
-            BUSESPAR[2].push_back(0); // speed
-            BUSESPAR[3].push_back(0); // gapf
-            BUSESPAR[4].push_back(0); // gapfl
-            BUSESPAR[5].push_back(0); // gapbl
-            BUSESPAR[6].push_back(0); //vbef
-            BUSESPAR[10].push_back(acc); // acceleration
-            BUSESPAR[11].push_back(LINEID); //lineID
-            BUSESPAR[12].push_back(0); //lineID
-            BUSESPAR[13].push_back(0); // laststoptime
-            BUSESPAR[14].push_back(0); // dwell time
-            BUSESPAR[16].push_back(0); // bus occupation
-            BUSESPAR[17].push_back(PARKED[1].back()); // The bus is
-            BUSESPAR[18].push_back(TIME); //the initial time
-
-            BUSESBOOL[0].push_back(true); //changing
-            BUSESBOOL[1].push_back(true); //advancing
-
-            //std::cout<<"Created bus for "<<LINEID<<std::endl;
-            // we retrieve the first stop information
-                // we retrieve the first stop information
-            if (SYSTEM.Lines[LINEID].stopx.size()>0){ // in case there are stops
-                BUSESPAR[7].push_back(SYSTEM.Lines[LINEID].stopx[0]);
-                BUSESPAR[8].push_back(SYSTEM.Lines[LINEID].stationIDs[0]);
-                BUSESPAR[9].push_back(SYSTEM.Stations[BUSESPAR[8].back()].x-2*Db);
-                BUSESPAR[15].push_back(0);
-            }
-            else{ // the nonstop buses
-                BUSESPAR[7].push_back(-1e6);
-                BUSESPAR[8].push_back(-1);
-                BUSESPAR[9].push_back(-1e6);
-                BUSESPAR[15].push_back(-1);
-            }
-            // We remove the bus from the parking list
-            PARKED[1].pop_back();
-        }
-        else{  // if there are no buses available, we introduce the bus to the queue
-            QUEUES[1].push_back(LINEID);
-        }
-    }
-} 
-
-
-
-// creating a bus
-void transformbus(int busindex, int LINEID, System& SYSTEM, std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], std::deque<int> QUEUES[2], int TIME){
-    //std::cout<<"In transformbus"<<std::endl;
-    int acc = SYSTEM.Lines[LINEID].acc; // We check the direction of movement
-    if (acc>0){ // buses moving in the east direction   
-
-        BUSESPAR[0][busindex]=SYSTEM.limits[0]; //position
-        BUSESPAR[1][busindex]=0;  // position in y
-        BUSESPAR[2][busindex]=0;  // speed
-        BUSESPAR[3][busindex]=0;  // gapf
-        BUSESPAR[4][busindex]=0;  // gapfl
-        BUSESPAR[5][busindex]=0;  // gapbl
-        BUSESPAR[6][busindex]=0;  // gapbl
-        BUSESPAR[10][busindex]=1; // acceleration
-        BUSESPAR[11][busindex]=LINEID; //lineID
-        BUSESPAR[12][busindex]=0; //laststoptime
-        BUSESPAR[13][busindex]=0; //stoptime
-        BUSESPAR[14][busindex]=0; //dwelltime
-        BUSESPAR[16][busindex]=0; //bus occupation
-        BUSESPAR[18][busindex]=TIME; //the initial time
-        BUSESBOOL[0][busindex]=true; //changing
-        BUSESBOOL[1][busindex]=true; //advancing
-
-        //std::cout<<"Created bus for "<<LINEID<<std::endl;
-
-        // we retrieve the first stop information
-        if (SYSTEM.Lines[LINEID].stopx.size()>0){ // in case there are stops
-            BUSESPAR[7][busindex]=SYSTEM.Lines[LINEID].stopx[0];
-            BUSESPAR[8][busindex]=SYSTEM.Lines[LINEID].stationIDs[0];
-            BUSESPAR[9][busindex]=SYSTEM.Stations[BUSESPAR[8][busindex]].x+(Nw-1)*Ds+Dw+2*Db;
-            BUSESPAR[15][busindex]=0;
-        }
-        else{ // the nonstop buses
-            BUSESPAR[7][busindex]=1e6;
-            BUSESPAR[9][busindex]=1e6;
-            BUSESPAR[8][busindex]=-1;
-            BUSESPAR[15][busindex]=-1;
-        }
-
-    }
-    else if (acc<0){ //Buses moving in the west direction
-        BUSESPAR[0][busindex]=SYSTEM.limits[1]; //position
-        BUSESPAR[1][busindex]=0;  // position in y
-        BUSESPAR[2][busindex]=0;  // speed
-        BUSESPAR[3][busindex]=0;  // gapf
-        BUSESPAR[4][busindex]=0;  // gapfl
-        BUSESPAR[5][busindex]=0;  // gapbl
-        BUSESPAR[6][busindex]=0;  // gapbl
-        BUSESPAR[10][busindex]=-1; // acceleration
-        BUSESPAR[11][busindex]=LINEID; //lineID
-        BUSESPAR[12][busindex]=0; //laststoptime
-        BUSESPAR[13][busindex]=0; //stoptime
-        BUSESPAR[14][busindex]=0; //dwelltime
-        BUSESPAR[16][busindex]=0; //bus occupation      
-        BUSESPAR[18][busindex]=TIME; //the initial time
-        BUSESBOOL[0][busindex]=true; //changing
-        BUSESBOOL[1][busindex]=true; //advancing
-
-        //std::cout<<"Created bus for "<<LINEID<<std::endl;
-        // we retrieve the first stop information
-            // we retrieve the first stop information
-        if (SYSTEM.Lines[LINEID].stopx.size()>0){ // in case there are stops
-            BUSESPAR[7][busindex]=SYSTEM.Lines[LINEID].stopx[0];
-            BUSESPAR[8][busindex]=SYSTEM.Lines[LINEID].stationIDs[0];
-            BUSESPAR[9][busindex]=SYSTEM.Stations[BUSESPAR[8][busindex]].x-2*Db;
-            BUSESPAR[15][busindex]=0;
-        }
-        else{ // the nonstop buses
-            BUSESPAR[7][busindex]=-1e6;
-            BUSESPAR[9][busindex]=-1e6;
-            BUSESPAR[8][busindex]=-1;
-            BUSESPAR[15][busindex]=-1;
-        }
-    }
-} 
-*/
 void updatestop(int index, std::vector<int> BUSESPAR[Nparam], System & SYSTEM){
     int line=BUSESPAR[10][index];
     int i=BUSESPAR[9][index]+1; // updating the index to the next station
@@ -495,7 +316,7 @@ void buschangelane(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOO
 
 
 // making the buses move
-void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, int TIME, std::vector<int> &PARKED, std::vector<float> &bussp, float & cost, std::array<std::array<int, 2*L>, Nmax> V, std::default_random_engine &generator, bool measuring){
+void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, int TIME, std::vector<int> &PARKED, std::array<std::array<int, 2*L>, Nmax> V, std::default_random_engine &generator, bool measuring){
     int x,y, lineID, dt;
     float prand, mean, std;
     //std::cout<<"Bus advanced "<<BUSESPAR[0].size()<<std::endl;
@@ -504,6 +325,8 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
     for (int i =0; i<BUSESPAR[0].size(); i++){
         x = BUSESPAR[0][i];
         y = BUSESPAR[1][i];
+        lineID = BUSESPAR[10][i];
+
         // buses advancing
         if (BUSESBOOL[0][i]==true){
             // we implement the VDR-TCA model of Maerivoet
@@ -519,6 +342,22 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
             if (r<prand){BUSESPAR[2][i] = std::max(0,BUSESPAR[2][i]-1);}
             // now we update the position
             BUSESPAR[0][i]=BUSESPAR[0][i]+BUSESPAR[2][i];
+
+            // checking whether the bus entered a station
+            if (BUSESPAR[0][i]>=SYSTEM.Lines[lineID].measBeg){ //The new position is located after the beginning of the station
+                    if(x<SYSTEM.Lines[lineID].measBeg){ // The last position was located before the beginning of the station
+                        BUSESPAR[17][i] = TIME;
+                    }
+                }
+        
+            
+            // checking whether the bus left a station
+            if (BUSESPAR[0][i]>=SYSTEM.Lines[lineID].measEnd){ //The new position is located after the beginning of the station
+                    if(x<SYSTEM.Lines[lineID].measEnd){ // The last position was located before the beginning of the station
+                        SYSTEM.Lines[lineID].times.push_back(TIME - BUSESPAR[17][i]); // getting the information of the time spent at the station
+                }
+            }
+
             // checking whether the bus reaches a stop
             if (BUSESPAR[0][i]==BUSESPAR[7][i]){
                 // we set the speed, advancing and stoptime to zero
@@ -526,7 +365,6 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
                 BUSESBOOL[0][i]=false;
                 BUSESPAR[11][i]=0;
                 // we board and alight passengers, and set the dwell time
-                lineID = BUSESPAR[10][i];
                 if (SYSTEM.Lines[lineID].lasttime>0){ // if this is not the first bus
                     dt = TIME - SYSTEM.Lines[lineID].lasttime; // we calculate the headway
                     //std::cout<<dt<<std::endl;
@@ -546,8 +384,6 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
                     BUSESPAR[12][i] = (int) distribution(generator);
                     //std::cout<<"try "<<dt<<" "<<mean<<" "<<std<<" "<<BUSESPAR[12][i]<<std::endl;
                 }while(BUSESPAR[12][i]<10);
-                // we add the headway to the list
-                
                 //std::cout<<dt<<" "<<mean<<" "<<std<<" "<<BUSESPAR[12][i]<<std::endl;
                 // we update the stop information
                 updatestop(i,BUSESPAR,SYSTEM);
@@ -557,10 +393,6 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
 
             // checking whether the bus leaves the system
             else if (BUSESPAR[0][i]>SYSTEM.Lines[BUSESPAR[10][i]].end){
-                //We add the speed of the bus to the list
-                bussp.push_back(float(BUSESPAR[0][i]-SYSTEM.Lines[BUSESPAR[10][i]].origin)/(TIME-BUSESPAR[14][i]));///
-                // we update the cost value
-                cost+=TIME-BUSESPAR[14][i];
                 //  the bus is removed and added to the parked list
                 toremove.push_back(i);
                 PARKED.push_back(BUSESPAR[13][i]);
@@ -608,19 +440,4 @@ void populate(std::vector<int>& Parked, std::vector<int> BUSESPAR[Nparam], Syste
     }
 }
 
-/*
-
-// Calculating the passenger flow and the station occupation
-void getPassengerFlowSpeedOccFast(std::vector<int> BUSESPAR[Nparam], float &flow, float &occ, int Nactivepass, int &ncounts){
-    float newflow=0;
-    float newocc=0;
-    for (int i=0; i<BUSESPAR[0].size(); i++){ // we scan over buses
-        newflow+=abs(BUSESPAR[2][i])*BUSESPAR[16][i];
-        newocc+=BUSESPAR[16][i];
-    }
-    occ+=Nactivepass-newocc; // Active passengers minus passengers in buses
-    flow+=newflow;
-    ncounts++;
-}
-*/
 #endif

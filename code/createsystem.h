@@ -30,7 +30,7 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
     stopdefinitions_f.open(stopdefinitions);
     std::string Line;
     std::string read;
-    int ID;
+    int ID, begin, end;
     std::string stName;
     while (std::getline(stoplist_f,Line)){
         std::istringstream iss(Line);
@@ -104,8 +104,15 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         int origin = std::stoi(read);
         iss>>read;
         int end = std::stoi(read);
+        iss>>read;
+        int measBeg = std::stoi(read);
+        iss>>read;
+        int measEnd = std::stoi(read);
         SYSTEM.Lines[ID].origin =(int) std::round(1.0*origin/Dx);
         SYSTEM.Lines[ID].end = (int) std::round(1.0*end/Dx);
+        SYSTEM.Lines[ID].measBeg =(int) std::round(1.0*measBeg/Dx);
+        SYSTEM.Lines[ID].measEnd = (int) std::round(1.0*measEnd/Dx);
+
         while(iss>>read){
             int stopID = std::stoi(read);
             iss>>read;
