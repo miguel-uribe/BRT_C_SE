@@ -91,8 +91,11 @@ int main (int argc, char **argv){
     ///////////////// Creating the distributions
     std::vector<std::poisson_distribution<int>> distr;
     for(int i = 0; i<NLines ; i++){
+        //cout<<SYSTEM.Lines[i].headway<<endl;
         distr.push_back(std::poisson_distribution<int> (1.0/SYSTEM.Lines[i].headway));
     }
+
+    
 
     ///////////////////////////////////////////////////////////////
     // Creating the bus array
@@ -128,7 +131,7 @@ int main (int argc, char **argv){
         }
         int nbuses = 0;
         bool measuring = false;
-        for (int TIME=0; TIME<2*3600;TIME++){      
+        for (int TIME=0; TIME<3*3600;TIME++){      
             // inserting the buses
             //cout<<t<<endl;
             calculategaps(BusesPar,BusesBool, EL, LC, RC);
@@ -166,9 +169,8 @@ int main (int argc, char **argv){
      
     fileroot = fileroot + "_seed_" + to_string(seed);
     
-    // exporting the headways for each service
-    filename = fileroot + "_headways.txt";
-    
+    // exporting the times at the stations for each service
+    filename = fileroot + "_times.txt";
 
     int maxdata = 0;
     string text = "";
@@ -196,8 +198,9 @@ int main (int argc, char **argv){
     headfile<<text;
     headfile.close();
 
-    // exporting the times at the stations for each service
-    filename = fileroot + "_times.txt";
+
+    // exporting the headways for each service
+    filename = fileroot + "_headways.txt";
     maxdata = 0;
     text = "";
     for (auto line: SYSTEM.Lines){
@@ -223,5 +226,7 @@ int main (int argc, char **argv){
     timesfile<<text;
     timesfile.close();
 
+
+    
     return 0;
 }

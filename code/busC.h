@@ -383,8 +383,9 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
                 do{
                     BUSESPAR[12][i] = (int) distribution(generator);
                     //std::cout<<"try "<<dt<<" "<<mean<<" "<<std<<" "<<BUSESPAR[12][i]<<std::endl;
-                }while(BUSESPAR[12][i]<10);
+                }while(BUSESPAR[12][i]<5);
                 //std::cout<<dt<<" "<<mean<<" "<<std<<" "<<BUSESPAR[12][i]<<std::endl;
+                //std::cout<<BUSESPAR[12][i]<<" "<<lineID<<std::endl;
                 // we update the stop information
                 updatestop(i,BUSESPAR,SYSTEM);
                 // We update the last stop information
@@ -435,6 +436,7 @@ void populate(std::vector<int>& Parked, std::vector<int> BUSESPAR[Nparam], Syste
         // determining how many buses must be included for each line
         nbus = distr[i](generator);
         if (nbus>0){ // if there are buses to add
+            //std::cout<<nbus<<" "<<i<<std::endl;
             createbus(Parked, i, SYSTEM, BUSESPAR, BUSESBOOL, time);
         }
     }
