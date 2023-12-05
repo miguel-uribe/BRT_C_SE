@@ -25,6 +25,9 @@ class lineC{
         int lasttime = 0; // The last time a bus arrived at the station
         int measBeg; // the starting point of the measurement window
         int measEnd; // the ending point of the measurement window
+        int dwell_alpha; // the alpha of the dwell time
+        int dwell_beta; // The beta of the dwell time
+        std::gamma_distribution<double> distribution;
 
         // Dummy constructor
         lineC(){}
@@ -32,6 +35,7 @@ class lineC{
         lineC(std::string NAME){
             name = NAME;
         }
+        
 
         std::string display (void);
         void setstopx(std::vector<int> &STATIONIDS, std::vector<int> &WAGONS, stationC* STATIONS);

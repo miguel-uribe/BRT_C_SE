@@ -61,7 +61,7 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
     routelist_f.open(routelist);
     routedefinitions_f.open(routedefinitions);
     routeheadways_f.open(routeheadways);
-
+    float dist_k, dist_theta;
     std::string lName;
     while (std::getline(routelist_f,Line)){
         std::istringstream iss(Line);
@@ -92,6 +92,12 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         SYSTEM.Lines[ID].dwellhway = dwellhwy;
         SYSTEM.Lines[ID].dwellwidth = dwellwidth;
         SYSTEM.Lines[ID].biart = biart;
+        // we now calculate the distribution parameters
+        dist_k = dwelltime*dwelltime/(dwellwidth*dwellwidth);
+        dist_theta = (dwellwidth*dwellwidth)/dwelltime;
+        // we update the distribution
+        SYSTEM.Lines[ID].distribution.param(std::gamma_distribution<double>::param_type(dist_k, dist_theta));
+
     }
     // loading the information regarding the stops
     std::vector<int> stationIDs;
@@ -123,6 +129,8 @@ auto createsystem(std::string stoplist, std::string stopdefinitions, std::string
         SYSTEM.Lines[ID].setstopx(stationIDs, wagonIDs, SYSTEM.Stations);
         stationIDs.clear();
         wagonIDs.clear();
+
+        
     }
 
     routelist_f.close();

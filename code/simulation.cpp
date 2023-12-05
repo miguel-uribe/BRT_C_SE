@@ -20,6 +20,7 @@ int main (int argc, char **argv){
 
     // The arguments list
     // 1 - seed
+    // 2 - whether the animation data should be exported
 
     //cout<<"Read the input matrix and transfer matrix"<< endl;
     /////////////////////////////////////////////////////////////

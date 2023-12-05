@@ -148,7 +148,7 @@ void updatestop(int index, std::vector<int> BUSESPAR[Nparam], System & SYSTEM){
 }
 
 // This function calculates the forward gaps for all buses
-void calculategaps(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> EL,  std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> LC,  std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> RC){
+void calculategaps(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> & EL,  std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> & LC,  std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> & RC){
     int x,y,kind;
     int lme=-1; // last main east
     int lse=-1; // last stopping east
@@ -270,7 +270,7 @@ void gapsl(int index, std::vector<int> BUSESPAR[Nparam]){
 
 
 // This function creates all the line changes in the system   
-void buschangelane(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> LC, std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> RC){
+void buschangelane(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> & LC, std::array<std::array<std::array<int, 2*L>, Nmax>, nkind> & RC){
     int x, y, kind;
     // Change from the main lane to the stopping lane
     std::vector<int> newy = BUSESPAR[1]; // by default, the bus stays in the same lane
@@ -316,7 +316,7 @@ void buschangelane(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOO
 
 
 // making the buses move
-void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, int TIME, std::vector<int> &PARKED, std::array<std::array<int, 2*L>, Nmax> V, std::default_random_engine &generator, bool measuring){
+void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[Nbool], System& SYSTEM, int TIME, std::vector<int> &PARKED, std::array<std::array<int, 2*L>, Nmax> & V, std::default_random_engine &generator, bool measuring){
     int x,y, lineID, dt;
     float prand, mean, std;
     //std::cout<<"Bus advanced "<<BUSESPAR[0].size()<<std::endl;
@@ -376,15 +376,9 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
                 else{ // For the first bus we do not count
                     dt = 0; // Default value
                 }
-                mean = SYSTEM.Lines[lineID].dwelltime + dt*SYSTEM.Lines[lineID].dwellhway; // the nominal dwell time
-                std = mean*SYSTEM.Lines[lineID].dwellwidth;  // the width of the distribution
-                std::normal_distribution<double> distribution(mean,std); // we define the distribution
                 // we generate the dwell time
-                do{
-                    BUSESPAR[12][i] = (int) distribution(generator);
-                    //std::cout<<"try "<<dt<<" "<<mean<<" "<<std<<" "<<BUSESPAR[12][i]<<std::endl;
-                }while(BUSESPAR[12][i]<5);
-                //std::cout<<dt<<" "<<mean<<" "<<std<<" "<<BUSESPAR[12][i]<<std::endl;
+                BUSESPAR[12][i] = (int) SYSTEM.Lines[lineID].distribution(generator);
+                //std::cout<<lineID<<" "<<BUSESPAR[12][i]<<std::endl;
                 //std::cout<<BUSESPAR[12][i]<<" "<<lineID<<std::endl;
                 // we update the stop information
                 updatestop(i,BUSESPAR,SYSTEM);
@@ -428,7 +422,7 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
 
 
 // inserting the buses in the system
-void populate(std::vector<int>& Parked, std::vector<int> BUSESPAR[Nparam], System& SYSTEM, std::vector<bool> BUSESBOOL[Nbool], std::default_random_engine &generator, std::vector<std::poisson_distribution<int>> distr, int time){
+void populate(std::vector<int>& Parked, std::vector<int> BUSESPAR[Nparam], System& SYSTEM, std::vector<bool> BUSESBOOL[Nbool], std::default_random_engine &generator, std::vector<std::poisson_distribution<int>> & distr, int time){
     int nbus;
     // Now we check and see whether it is time to populate
     // we scan over the lines   

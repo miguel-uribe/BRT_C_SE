@@ -77,6 +77,7 @@ for wagon in np.arange(6):
     # in addition, it is impossible to move to the left when the lane in the left is not there
     mask = np.where(lanes-np.roll(lanes, 1, axis = 1)==1)
     RC[mask] = 0
+    
     # now we check for possible special lane changing arrangements
     for rule in LCR:
         if rule[0]=='LSB':
