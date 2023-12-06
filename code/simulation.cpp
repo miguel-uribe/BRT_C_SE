@@ -132,7 +132,7 @@ int main (int argc, char **argv){
         }
         int nbuses = 0;
         bool measuring = false;
-        for (int TIME=0; TIME<3*3600;TIME++){      
+        for (int TIME=0; TIME<100*3600;TIME++){      
             // inserting the buses
             //cout<<t<<endl;
             calculategaps(BusesPar,BusesBool, EL, LC, RC);

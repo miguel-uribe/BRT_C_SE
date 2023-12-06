@@ -377,8 +377,8 @@ void busadvance(std::vector<int> BUSESPAR[Nparam], std::vector<bool> BUSESBOOL[N
                     dt = 0; // Default value
                 }
                 // we generate the dwell time
-                BUSESPAR[12][i] = (int) SYSTEM.Lines[lineID].distribution(generator);
-                //std::cout<<lineID<<" "<<BUSESPAR[12][i]<<std::endl;
+                BUSESPAR[12][i] = (int) SYSTEM.Lines[lineID].distribution(generator)+0.5;
+                std::cout<<lineID<<" "<<BUSESPAR[12][i]<<std::endl;
                 //std::cout<<BUSESPAR[12][i]<<" "<<lineID<<std::endl;
                 // we update the stop information
                 updatestop(i,BUSESPAR,SYSTEM);
